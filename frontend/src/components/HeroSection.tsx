@@ -27,8 +27,8 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
           gap: '1.15rem',
         }}
       >
-        {/* Main Large Gold Title: SINYORA - GEE */}
-        <h1 className="hero-brand-title-gold">SINYORA - GEE</h1>
+        {/* Main Large Gold Title: SINYORA GEE */}
+        <h1 className="hero-brand-title-gold">SINYORA GEE</h1>
 
         {/* Centered Subtitle: LUXURY FACIAL & SPA */}
         <p className="hero-brand-subtitle">LUXURY FACIAL &amp; SPA</p>
@@ -103,7 +103,7 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
             >
               <div>
                 <h3 style={{ fontSize: '1.1rem' }}>
-                  SINYORA - GEE • Official Service &amp; Price Flyer
+                  SINYORA GEE • Official Service &amp; Price Flyer
                 </h3>
                 <p style={{ fontSize: '0.76rem', color: 'var(--text-muted)' }}>
                   {STUDIO_INFO.location} • {STUDIO_INFO.phone}

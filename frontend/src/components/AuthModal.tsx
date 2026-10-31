@@ -123,7 +123,7 @@ export default function AuthModal({
               }}
             >
               {mode === 'admin'
-                ? 'SINYORA - GEE • Management Portal'
+                ? 'SINYORA GEE • Management Portal'
                 : 'Client Account Access'}
             </div>
             <h3 style={{ fontSize: '1.15rem' }}>

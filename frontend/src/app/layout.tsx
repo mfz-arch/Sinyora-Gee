@@ -3,7 +3,7 @@ import './globals.css';
 import { StoreProvider } from '@/context/StoreContext';
 
 export const metadata: Metadata = {
-  title: 'SINYORA - GEE | Luxury Facial & Spa — Royal Hostel',
+  title: 'SINYORA GEE | Luxury Facial & Spa — Royal Hostel',
   description:
     'Experience clinical-grade facial machines, Korean glass skin treatments, soothing full-body massage, flawless makeup and curated skincare essentials — located at Royal Hostel.',
 };

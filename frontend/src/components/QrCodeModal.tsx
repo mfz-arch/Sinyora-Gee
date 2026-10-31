@@ -466,3 +466,4 @@ export default function QrCodeModal({ isOpen, onClose }: QrCodeModalProps) {
     </div>
   );
 }
+

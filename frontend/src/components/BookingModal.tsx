@@ -234,9 +234,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                       borderBottom: '1px dashed rgba(212, 175, 55, 0.35)',
                     }}
                   >
-                    <span>
-                      {s.name} ({s.duration})
-                    </span>
+                    <span>{s.name}</span>
                     <strong>{formatTsh(s.price)}</strong>
                   </div>
                 ))}
@@ -393,10 +391,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                         }}
                       >
                         <div>
-                          <strong>{srv.name}</strong>{' '}
-                          <span style={{ color: 'var(--text-muted)' }}>
-                            ({srv.duration})
-                          </span>
+                          <strong>{srv.name}</strong>
                         </div>
                         <div
                           style={{
@@ -454,7 +449,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                     return (
                       <option key={srv.id} value={srv.id}>
                         {already ? '✓ ' : '+ '}
-                        {srv.name} — {formatTsh(srv.price)} ({srv.duration})
+                        {srv.name} — {formatTsh(srv.price)}
                       </option>
                     );
                   })}

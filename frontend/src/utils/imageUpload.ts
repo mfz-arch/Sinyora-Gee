@@ -49,3 +49,4 @@ export function compressProductImage(
     reader.readAsDataURL(file);
   });
 }
+

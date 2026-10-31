@@ -3,7 +3,6 @@
 import React, { useState } from 'react';
 import {
   Sparkles,
-  Clock,
   Check,
   Plus,
   Calendar,
@@ -362,22 +361,6 @@ export default function ServicesSection({
                                 {srv.badge}
                               </span>
                             )}
-                            <span
-                              style={{
-                                marginInlineStart: 'auto',
-                                background: 'rgba(255, 253, 249, 0.92)',
-                                color: 'var(--text-primary)',
-                                fontSize: '0.72rem',
-                                fontWeight: 600,
-                                padding: '0.22rem 0.6rem',
-                                borderRadius: '999px',
-                                display: 'inline-flex',
-                                alignItems: 'center',
-                                gap: '0.25rem',
-                              }}
-                            >
-                              <Clock size={12} /> {srv.duration}
-                            </span>
                           </div>
                         </div>
 

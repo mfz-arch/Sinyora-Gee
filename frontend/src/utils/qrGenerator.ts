@@ -264,3 +264,4 @@ export function generateQrMatrix(text: string): boolean[][] {
 
   return modules;
 }
+

@@ -979,13 +979,6 @@ export default function AdminDashboard({
                       onChange={(e) => setSrvPrice(e.target.value)}
                       className="form-input"
                     />
-                    <input
-                      type="text"
-                      placeholder="Duration (e.g. 45 mins)"
-                      value={srvDuration}
-                      onChange={(e) => setSrvDuration(e.target.value)}
-                      className="form-input"
-                    />
                   </div>
                   <input
                     type="text"
@@ -1028,15 +1021,7 @@ export default function AdminDashboard({
                     >
                       <div>
                         <div style={{ fontWeight: 700, fontSize: '0.92rem' }}>
-                          {s.name}{' '}
-                          <span
-                            style={{
-                              fontSize: '0.75rem',
-                              color: 'var(--text-muted)',
-                            }}
-                          >
-                            ({s.duration})
-                          </span>
+                          {s.name}
                         </div>
                         <div
                           style={{

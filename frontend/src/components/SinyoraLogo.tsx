@@ -145,3 +145,4 @@ export default function SinyoraLogo({ size = 'md' }: SinyoraLogoProps) {
     </div>
   );
 }
+

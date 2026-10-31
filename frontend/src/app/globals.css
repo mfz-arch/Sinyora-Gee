@@ -192,10 +192,11 @@ button {
 
 /* Metallic Gold Title for SINYORA - GEE */
 .hero-brand-title-gold {
-  font-size: clamp(2.4rem, 6.5vw, 5.25rem);
+  font-size: clamp(1.95rem, 6.5vw, 5.25rem);
   font-weight: 800;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
+  white-space: nowrap;
   background: linear-gradient(
     180deg,
     #fff6d1 0%,
@@ -211,8 +212,8 @@ button {
 }
 
 .hero-brand-subtitle {
-  font-size: clamp(0.92rem, 2vw, 1.35rem);
-  letter-spacing: 0.28em;
+  font-size: clamp(0.78rem, 2.2vw, 1.35rem);
+  letter-spacing: clamp(0.16em, 1vw, 0.28em);
   text-transform: uppercase;
   font-family:
     'Inter',
@@ -229,19 +230,104 @@ button {
 }
 
 .section-fluid-title {
-  font-size: clamp(1.5rem, 3.6vw, 2.9rem);
+  font-size: clamp(1.4rem, 3.6vw, 2.9rem);
 }
 
 @supports (font-size: 1cqi) {
   .hero-brand-title-gold {
     /* Max is <= 2.5x min for accessibility compliance */
-    font-size: clamp(2.3rem, 7cqi, 5.4rem);
+    font-size: clamp(2rem, 7.2cqi, 5rem);
   }
   .hero-brand-subtitle {
-    font-size: clamp(0.85rem, 2cqi, 1.45rem);
+    font-size: clamp(0.78rem, 2.2cqi, 1.45rem);
   }
   .section-fluid-title {
-    font-size: clamp(1.5rem, 4cqi, 3rem);
+    font-size: clamp(1.4rem, 4cqi, 3rem);
+  }
+}
+
+/* Responsive Header Layout for Phone & PC */
+.header-inner {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas:
+    'logo actions'
+    'nav  nav';
+  align-items: center;
+  row-gap: 0.4rem;
+  column-gap: 0.5rem;
+  padding-block: 0.45rem;
+}
+
+.header-logo-area {
+  grid-area: logo;
+}
+
+.header-nav-area {
+  grid-area: nav;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1.25rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.2);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.header-actions-area {
+  grid-area: actions;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 0.4rem;
+}
+
+@media (min-width: 860px) {
+  .header-inner {
+    grid-template-columns: auto 1fr auto;
+    grid-template-areas: 'logo nav actions';
+    padding-block: 0.5rem;
+  }
+
+  .header-nav-area {
+    padding-top: 0;
+    border-top: none;
+    gap: 2.2rem;
+    font-size: 0.88rem;
+  }
+
+  .header-actions-area {
+    gap: 0.55rem;
+  }
+}
+
+/* Hero Buttons Row on Phone vs PC */
+.hero-cta-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.55rem;
+  inline-size: 100%;
+}
+
+@media (max-width: 600px) {
+  .hero-skincare-backdrop {
+    min-block-size: 420px;
+    padding-block: 2.25rem 2.6rem;
+  }
+
+  .hero-cta-row .btn-gold,
+  .hero-cta-row .btn-primary,
+  .hero-cta-row .btn-hero-outline {
+    padding: 0.46rem 0.9rem;
+    font-size: 0.76rem;
+  }
+
+  .nav-box-btn {
+    padding: 0.36rem 0.68rem;
+    font-size: 0.72rem;
   }
 }
 

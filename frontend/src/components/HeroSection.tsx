@@ -61,26 +61,18 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
         </p>
 
         {/* Centered Row of 3 Sleek, Compact Buttons matching the template */}
-        <div
-          style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: '0.75rem',
-          }}
-        >
+        <div className="hero-cta-row">
           <button
             type="button"
             onClick={onOpenBooking}
             className="btn-gold"
           >
-            <Calendar size={15} />
+            <Calendar size={14} />
             <span>Book a treatment</span>
           </button>
 
           <a href="#products" className="btn-primary">
-            <ShoppingBag size={15} />
+            <ShoppingBag size={14} />
             <span>Cosmetic shop</span>
           </a>
 
@@ -89,7 +81,7 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
             onClick={() => setShowFlyerModal(true)}
             className="btn-hero-outline"
           >
-            <Eye size={15} />
+            <Eye size={14} />
             <span>View price flyer</span>
           </button>
         </div>

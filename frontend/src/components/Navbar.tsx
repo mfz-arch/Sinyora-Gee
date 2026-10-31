@@ -116,21 +116,12 @@ export default function Navbar({
           boxShadow: '0 6px 24px rgba(0, 0, 0, 0.28)',
         }}
       >
-        <div
-          className="page-shell"
-          style={{
-            display: 'flex',
-            alignItems: 'safe center',
-            justifyContent: 'space-between',
-            paddingBlock: '0.45rem',
-            gap: '0.75rem',
-            flexWrap: 'wrap',
-          }}
-        >
+        <div className="page-shell header-inner">
           {/* Left: Uploaded Logo (Background Removed & Matched Directly) */}
           <a
             href="#top"
             onClick={() => setActiveView('storefront')}
+            className="header-logo-area"
             style={{
               textDecoration: 'none',
               display: 'inline-flex',
@@ -142,16 +133,7 @@ export default function Navbar({
           </a>
 
           {/* Center Navigation Links: Services & price | Cosmetics shop | Contact us */}
-          <nav
-            style={{
-              display: 'flex',
-              alignItems: 'safe center',
-              gap: 'clamp(0.85rem, 2.4vw, 2.2rem)',
-              fontSize: '0.86rem',
-              fontWeight: 600,
-              color: '#fce8ee',
-            }}
-          >
+          <nav className="header-nav-area" style={{ color: '#fce8ee' }}>
             <a
               href="#services"
               onClick={() => setActiveView('storefront')}
@@ -188,14 +170,7 @@ export default function Navbar({
           </nav>
 
           {/* Right: Dedicated [Management] button for Admins + [Signup/Signin] for Clients */}
-          <div
-            style={{
-              display: 'flex',
-              alignItems: 'safe center',
-              gap: '0.5rem',
-              marginInlineStart: 'auto',
-            }}
-          >
+          <div className="header-actions-area">
             {totalCartItems > 0 && (
               <button
                 type="button"

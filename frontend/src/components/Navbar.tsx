@@ -104,16 +104,17 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* 2. Main Header sitting directly over the skincare background */}
+      {/* 2. Main Header blending smoothly into the skincare background */}
       <header
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 50,
-          background: 'rgba(18, 10, 14, 0.32)',
-          backdropFilter: 'blur(8px)',
-          WebkitBackdropFilter: 'blur(8px)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.32)',
+          background:
+            'linear-gradient(180deg, rgba(18, 10, 14, 0.82) 0%, rgba(24, 13, 19, 0.52) 68%, rgba(24, 13, 19, 0.05) 100%)',
+          backdropFilter: 'blur(6px)',
+          WebkitBackdropFilter: 'blur(6px)',
+          borderBottom: 'none',
         }}
       >
         <div className="page-shell header-inner">

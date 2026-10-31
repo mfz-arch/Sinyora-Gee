@@ -1,0 +1,13 @@
+{
+  "name": "sinyora-gee-monorepo",
+  "version": "1.0.0",
+  "private": true,
+  "description": "SINYORA GEE — Luxury Facial, Cosmetics & Spa SaaS Platform",
+  "scripts": {
+    "dev": "npm --prefix frontend run dev",
+    "build": "npm --prefix frontend run build",
+    "start": "npm --prefix frontend run start",
+    "typecheck": "npm --prefix frontend run typecheck"
+  }
+}
+

@@ -129,7 +129,7 @@ export default function Navbar({
               flexShrink: 0,
             }}
           >
-            <SinyoraLogo size="sm" />
+            <SinyoraLogo size="md" />
           </a>
 
           {/* Center Navigation Links: Services & price | Cosmetics shop | Contact us */}

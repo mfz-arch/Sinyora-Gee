@@ -16,42 +16,34 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
       <div
         className="page-shell hero-fluid-container"
         style={{
-          maxInlineSize: '860px',
+          inlineSize: '100%',
+          maxInlineSize: '980px',
           marginInline: 'auto',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
           textAlign: 'center',
-          gap: '0.95rem',
+          gap: '1.15rem',
         }}
       >
-        {/* Main Gold Title: SINYORA - GEE */}
+        {/* Main Large Gold Title: SINYORA - GEE */}
         <h1 className="hero-brand-title-gold">SINYORA - GEE</h1>
 
         {/* Centered Subtitle: LUXURY FACIAL & SPA */}
         <p className="hero-brand-subtitle">LUXURY FACIAL &amp; SPA</p>
 
-        {/* Decorative Gold Divider */}
-        <div
-          style={{
-            inlineSize: '96px',
-            blockSize: '2px',
-            background:
-              'linear-gradient(90deg, transparent 0%, #d4af37 50%, transparent 100%)',
-            marginBlock: '0.2rem',
-          }}
-        />
-
-        {/* Centered Description matching the wireframe template */}
+        {/* Wide Horizontal Description matching the hand-drawn wireframe */}
         <p
           style={{
-            fontSize: 'clamp(0.95rem, 1.45vw, 1.12rem)',
-            color: '#f8eef2',
-            maxInlineSize: '64ch',
-            lineHeight: 1.7,
-            marginBlockEnd: '0.9rem',
-            textShadow: '0 2px 10px rgba(0, 0, 0, 0.55)',
+            inlineSize: '100%',
+            maxInlineSize: '760px',
+            marginInline: 'auto',
+            fontSize: 'clamp(1rem, 1.55vw, 1.2rem)',
+            color: '#fdf4f7',
+            lineHeight: 1.75,
+            marginBlock: '0.35rem 1.1rem',
+            textShadow: '0 2px 12px rgba(0, 0, 0, 0.65)',
           }}
         >
           Experience clinical-grade facial machines, Korean glass skin
@@ -60,19 +52,19 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
           <strong style={{ color: '#f7df8b' }}>{STUDIO_INFO.location}</strong>
         </p>
 
-        {/* Centered Row of 3 Sleek, Compact Buttons matching the template */}
+        {/* Horizontal Row of 3 Buttons matching the hand-drawn template */}
         <div className="hero-cta-row">
           <button
             type="button"
             onClick={onOpenBooking}
             className="btn-gold"
           >
-            <Calendar size={14} />
+            <Calendar size={15} />
             <span>Book a treatment</span>
           </button>
 
           <a href="#products" className="btn-primary">
-            <ShoppingBag size={14} />
+            <ShoppingBag size={15} />
             <span>Cosmetic shop</span>
           </a>
 
@@ -81,7 +73,7 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
             onClick={() => setShowFlyerModal(true)}
             className="btn-hero-outline"
           >
-            <Eye size={14} />
+            <Eye size={15} />
             <span>View price flyer</span>
           </button>
         </div>

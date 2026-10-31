@@ -184,36 +184,54 @@ button {
   white-space: nowrap;
 }
 
+/* Welcome Loader Bar Animation */
+@keyframes loaderProgress {
+  0% {
+    inline-size: 0%;
+  }
+  100% {
+    inline-size: 100%;
+  }
+}
+
+.welcome-loader-bar {
+  animation: loaderProgress 1.65s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
 /* Modern Web Guidance: fluid-scaling with container query units & vw fallback */
 .hero-fluid-container {
+  inline-size: 100%;
+  max-inline-size: 980px;
+  margin-inline: auto;
   container-type: inline-size;
   container-name: hero-box;
 }
 
-/* Metallic Gold Title for SINYORA - GEE */
+/* Metallic Gold Title for SINYORA - GEE (Large & Wide like the hand-drawn template) */
 .hero-brand-title-gold {
-  font-size: clamp(1.95rem, 6.5vw, 5.25rem);
+  font-size: clamp(2.35rem, 7.8vw, 6.2rem);
   font-weight: 800;
-  letter-spacing: 0.06em;
+  letter-spacing: 0.07em;
   text-transform: uppercase;
   white-space: nowrap;
+  line-height: 1.08;
   background: linear-gradient(
     180deg,
     #fff6d1 0%,
-    #f5d67b 35%,
-    #d4af37 70%,
+    #f5d67b 38%,
+    #d4af37 72%,
     #aa7c11 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: #d4af37;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 4px 18px rgba(0, 0, 0, 0.55));
+  filter: drop-shadow(0 5px 22px rgba(0, 0, 0, 0.65));
 }
 
 .hero-brand-subtitle {
-  font-size: clamp(0.78rem, 2.2vw, 1.35rem);
-  letter-spacing: clamp(0.16em, 1vw, 0.28em);
+  font-size: clamp(0.95rem, 2.4vw, 1.55rem);
+  letter-spacing: clamp(0.18em, 1.2vw, 0.32em);
   text-transform: uppercase;
   font-family:
     'Inter',
@@ -225,38 +243,40 @@ button {
 }
 
 .section-header-container {
+  inline-size: 100%;
   container-type: inline-size;
   container-name: section-header;
 }
 
 .section-fluid-title {
-  font-size: clamp(1.4rem, 3.6vw, 2.9rem);
+  font-size: clamp(1.5rem, 3.6vw, 2.9rem);
 }
 
 @supports (font-size: 1cqi) {
   .hero-brand-title-gold {
     /* Max is <= 2.5x min for accessibility compliance */
-    font-size: clamp(2rem, 7.2cqi, 5rem);
+    font-size: clamp(2.4rem, 8.2cqi, 6rem);
   }
   .hero-brand-subtitle {
-    font-size: clamp(0.78rem, 2.2cqi, 1.45rem);
+    font-size: clamp(0.9rem, 2.3cqi, 1.6rem);
   }
   .section-fluid-title {
-    font-size: clamp(1.4rem, 4cqi, 3rem);
+    font-size: clamp(1.5rem, 4cqi, 3rem);
   }
 }
 
 /* Responsive Header Layout for Phone & PC */
 .header-inner {
+  inline-size: 100%;
   display: grid;
   grid-template-columns: auto 1fr;
   grid-template-areas:
     'logo actions'
     'nav  nav';
   align-items: center;
-  row-gap: 0.4rem;
-  column-gap: 0.5rem;
-  padding-block: 0.45rem;
+  row-gap: 0.45rem;
+  column-gap: 0.75rem;
+  padding-block: 0.5rem;
 }
 
 .header-logo-area {
@@ -268,10 +288,10 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 1.25rem;
-  padding-top: 0.35rem;
-  border-top: 1px solid rgba(212, 175, 55, 0.2);
-  font-size: 0.78rem;
+  gap: clamp(1.25rem, 4vw, 3.25rem);
+  padding-top: 0.4rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.22);
+  font-size: 0.84rem;
   font-weight: 600;
 }
 
@@ -280,71 +300,75 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 0.4rem;
+  gap: 0.5rem;
 }
 
 @media (min-width: 860px) {
   .header-inner {
     grid-template-columns: auto 1fr auto;
     grid-template-areas: 'logo nav actions';
-    padding-block: 0.5rem;
+    padding-block: 0.55rem;
   }
 
   .header-nav-area {
     padding-top: 0;
     border-top: none;
-    gap: 2.2rem;
-    font-size: 0.88rem;
+    gap: clamp(2rem, 4.5vw, 3.8rem);
+    font-size: 0.94rem;
   }
 
   .header-actions-area {
-    gap: 0.55rem;
+    gap: 0.65rem;
   }
 }
 
 /* Hero Buttons Row on Phone vs PC */
 .hero-cta-row {
   display: flex;
+  flex-direction: row;
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.55rem;
+  gap: clamp(0.65rem, 2vw, 1.35rem);
   inline-size: 100%;
 }
 
 @media (max-width: 600px) {
   .hero-skincare-backdrop {
-    min-block-size: 420px;
-    padding-block: 2.25rem 2.6rem;
+    min-block-size: 440px;
+    padding-block: 2.5rem 2.8rem;
   }
 
   .hero-cta-row .btn-gold,
   .hero-cta-row .btn-primary,
   .hero-cta-row .btn-hero-outline {
-    padding: 0.46rem 0.9rem;
-    font-size: 0.76rem;
+    padding: 0.48rem 0.92rem;
+    font-size: 0.78rem;
   }
 
   .nav-box-btn {
-    padding: 0.36rem 0.68rem;
-    font-size: 0.72rem;
+    padding: 0.38rem 0.72rem;
+    font-size: 0.74rem;
   }
 }
 
 /* Centered Skincare Hero Backdrop matching wireframe template */
 .hero-skincare-backdrop {
   position: relative;
-  min-block-size: clamp(460px, 72dvh, 650px);
-  display: grid;
-  place-items: center;
+  inline-size: 100%;
+  min-block-size: clamp(480px, 75dvh, 680px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
   text-align: center;
-  padding-block: clamp(3rem, 7vw, 5.5rem);
+  padding-block: clamp(3.2rem, 7vw, 5.5rem);
   background-color: #1c1016;
   background-image:
     radial-gradient(
       circle at 50% 38%,
-      rgba(42, 20, 31, 0.58) 0%,
-      rgba(18, 10, 15, 0.86) 75%
+      rgba(42, 20, 31, 0.55) 0%,
+      rgba(18, 10, 15, 0.85) 75%
     ),
     url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1920&q=85');
   background-size: cover;

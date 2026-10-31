@@ -10,6 +10,7 @@ import BookingModal from '@/components/BookingModal';
 import AuthModal from '@/components/AuthModal';
 import ClientPortalModal from '@/components/ClientPortalModal';
 import AdminDashboard from '@/components/AdminDashboard';
+import WelcomeLoader from '@/components/WelcomeLoader';
 import { useStore } from '@/context/StoreContext';
 
 export default function HomePage() {
@@ -53,6 +54,9 @@ export default function HomePage() {
         flexDirection: 'column',
       }}
     >
+      {/* Opening Welcome Screen: Welcome to SINYORA GEE / luxury facials and spa */}
+      <WelcomeLoader />
+
       <Navbar
         activeView={activeView}
         setActiveView={setActiveView}

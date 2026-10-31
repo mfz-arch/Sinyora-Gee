@@ -24,6 +24,9 @@ export default function HomePage() {
 
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [isAuthOpen, setIsAuthOpen] = useState(false);
+  const [authInitialMode, setAuthInitialMode] = useState<
+    'signin' | 'signup' | 'admin'
+  >('signin');
   const [isClientPortalOpen, setIsClientPortalOpen] = useState(false);
 
   const handleOpenAdminProducts = () => {
@@ -32,13 +35,30 @@ export default function HomePage() {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const openClientAuth = () => {
+    setAuthInitialMode('signin');
+    setIsAuthOpen(true);
+  };
+
+  const openAdminAuth = () => {
+    setAuthInitialMode('admin');
+    setIsAuthOpen(true);
+  };
+
   return (
-    <div style={{ minBlockSize: '100dvh', display: 'flex', flexDirection: 'column' }}>
+    <div
+      style={{
+        minBlockSize: '100dvh',
+        display: 'flex',
+        flexDirection: 'column',
+      }}
+    >
       <Navbar
         activeView={activeView}
         setActiveView={setActiveView}
         onOpenBooking={() => setIsBookingOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenClientAuth={openClientAuth}
+        onOpenAdminAuth={openAdminAuth}
         onOpenClientPortal={() => setIsClientPortalOpen(true)}
       />
 
@@ -55,7 +75,7 @@ export default function HomePage() {
             <ProductsSection
               onOpenAdminProducts={handleOpenAdminProducts}
               onOpenClientPortal={() => setIsClientPortalOpen(true)}
-              onOpenAuth={() => setIsAuthOpen(true)}
+              onOpenAuth={openAdminAuth}
             />
           </>
         )}
@@ -63,7 +83,7 @@ export default function HomePage() {
 
       <Footer
         onOpenBooking={() => setIsBookingOpen(true)}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAuth={openAdminAuth}
       />
 
       {/* Interactive Modals */}
@@ -74,6 +94,7 @@ export default function HomePage() {
 
       <AuthModal
         isOpen={isAuthOpen}
+        initialMode={authInitialMode}
         onClose={() => setIsAuthOpen(false)}
         onSuccessAdminLogin={() => {
           setAdminInitialTab('bookings');
@@ -84,7 +105,7 @@ export default function HomePage() {
       <ClientPortalModal
         isOpen={isClientPortalOpen}
         onClose={() => setIsClientPortalOpen(false)}
-        onOpenAuth={() => setIsAuthOpen(true)}
+        onOpenAuth={openClientAuth}
         onOpenAdmin={() => {
           setAdminInitialTab('bookings');
           setActiveView('admin');
@@ -93,4 +114,3 @@ export default function HomePage() {
     </div>
   );
 }
-

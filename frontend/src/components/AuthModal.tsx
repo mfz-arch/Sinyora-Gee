@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   X,
   UserCheck,
@@ -14,18 +14,20 @@ import { useStore } from '@/context/StoreContext';
 
 interface AuthModalProps {
   isOpen: boolean;
+  initialMode?: 'signin' | 'signup' | 'admin';
   onClose: () => void;
   onSuccessAdminLogin: () => void;
 }
 
 export default function AuthModal({
   isOpen,
+  initialMode = 'signin',
   onClose,
   onSuccessAdminLogin,
 }: AuthModalProps) {
   const { login, registerClient } = useStore();
 
-  const [mode, setMode] = useState<'signin' | 'signup'>('signin');
+  const [mode, setMode] = useState<'signin' | 'signup' | 'admin'>(initialMode);
   const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');
@@ -36,6 +38,13 @@ export default function AuthModal({
     text: string;
   } | null>(null);
 
+  useEffect(() => {
+    if (isOpen) {
+      setMode(initialMode);
+      setFeedback(null);
+    }
+  }, [isOpen, initialMode]);
+
   if (!isOpen) return null;
 
   const handleSignIn = (e: React.FormEvent) => {
@@ -45,6 +54,14 @@ export default function AuthModal({
     const res = login(phone, password);
     if (!res.ok) {
       setFeedback({ type: 'error', text: res.message });
+      return;
+    }
+
+    if (mode === 'admin' && res.user?.role !== 'admin') {
+      setFeedback({
+        type: 'error',
+        text: 'This phone number is not a registered Management account.',
+      });
       return;
     }
 
@@ -79,7 +96,7 @@ export default function AuthModal({
     <div className="modal-backdrop" onClick={onClose}>
       <div
         className="modal-sheet"
-        style={{ maxInlineSize: '460px' }}
+        style={{ maxInlineSize: '440px' }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Header */}
@@ -88,115 +105,127 @@ export default function AuthModal({
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
-            padding: '1.1rem 1.35rem',
+            padding: '1rem 1.25rem',
             borderBottom: '1px solid var(--gold-border)',
-            background: 'var(--bg-secondary)',
+            background:
+              mode === 'admin' ? 'var(--dark-surface)' : 'var(--bg-secondary)',
+            color: mode === 'admin' ? '#f7df8b' : 'var(--text-primary)',
           }}
         >
           <div>
             <div
               style={{
-                fontSize: '0.7rem',
+                fontSize: '0.68rem',
                 fontWeight: 700,
                 textTransform: 'uppercase',
                 letterSpacing: '0.1em',
-                color: 'var(--brand-color)',
+                color: mode === 'admin' ? '#f3a6b8' : 'var(--brand-color)',
               }}
             >
-              Client &amp; Management Access
+              {mode === 'admin'
+                ? 'SINYORA - GEE • Management Portal'
+                : 'Client Account Access'}
             </div>
-            <h3 style={{ fontSize: '1.25rem' }}>
-              {mode === 'signin'
-                ? 'Sign In to Sinyora Gee'
-                : 'Create Student Account'}
+            <h3 style={{ fontSize: '1.15rem' }}>
+              {mode === 'admin'
+                ? 'Management Login'
+                : mode === 'signin'
+                  ? 'Client Sign In'
+                  : 'Client Sign Up'}
             </h3>
           </div>
           <button
             type="button"
             onClick={onClose}
             className="btn-outline"
-            style={{ padding: '0.4rem 0.6rem' }}
+            style={{ padding: '0.35rem 0.55rem' }}
             aria-label="Close sign in dialog"
           >
-            <X size={18} />
+            <X size={16} />
           </button>
         </div>
 
-        {/* Mode Switch Tabs */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr 1fr',
-            padding: '0.75rem 1.35rem 0',
-            gap: '0.5rem',
-          }}
-        >
-          <button
-            type="button"
-            onClick={() => {
-              setMode('signin');
-              setFeedback(null);
-            }}
+        {/* Mode Switch Tabs (Only shown for Client Signin/Signup, or switchable) */}
+        {mode !== 'admin' && (
+          <div
             style={{
-              padding: '0.6rem',
-              borderRadius: 'var(--radius-sm)',
-              border:
-                mode === 'signin'
-                  ? '1.5px solid var(--brand-color)'
-                  : '1px solid var(--gold-border)',
-              background:
-                mode === 'signin' ? 'var(--brand-color)' : 'var(--bg-surface)',
-              color: mode === 'signin' ? '#fff' : 'var(--text-primary)',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.4rem',
+              display: 'grid',
+              gridTemplateColumns: '1fr 1fr',
+              padding: '0.75rem 1.25rem 0',
+              gap: '0.45rem',
             }}
           >
-            <UserCheck size={15} /> Sign In
-          </button>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signin');
+                setFeedback(null);
+              }}
+              style={{
+                padding: '0.5rem',
+                borderRadius: 'var(--radius-sm)',
+                border:
+                  mode === 'signin'
+                    ? '1px solid var(--brand-color)'
+                    : '1px solid var(--gold-border)',
+                background:
+                  mode === 'signin'
+                    ? 'var(--brand-color)'
+                    : 'var(--bg-surface)',
+                color: mode === 'signin' ? '#fff' : 'var(--text-primary)',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <UserCheck size={14} /> Sign In
+            </button>
 
-          <button
-            type="button"
-            onClick={() => {
-              setMode('signup');
-              setFeedback(null);
-            }}
-            style={{
-              padding: '0.6rem',
-              borderRadius: 'var(--radius-sm)',
-              border:
-                mode === 'signup'
-                  ? '1.5px solid var(--brand-color)'
-                  : '1px solid var(--gold-border)',
-              background:
-                mode === 'signup' ? 'var(--brand-color)' : 'var(--bg-surface)',
-              color: mode === 'signup' ? '#fff' : 'var(--text-primary)',
-              fontWeight: 700,
-              fontSize: '0.85rem',
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: '0.4rem',
-            }}
-          >
-            <UserPlus size={15} /> Student Sign Up
-          </button>
-        </div>
+            <button
+              type="button"
+              onClick={() => {
+                setMode('signup');
+                setFeedback(null);
+              }}
+              style={{
+                padding: '0.5rem',
+                borderRadius: 'var(--radius-sm)',
+                border:
+                  mode === 'signup'
+                    ? '1px solid var(--brand-color)'
+                    : '1px solid var(--gold-border)',
+                background:
+                  mode === 'signup'
+                    ? 'var(--brand-color)'
+                    : 'var(--bg-surface)',
+                color: mode === 'signup' ? '#fff' : 'var(--text-primary)',
+                fontWeight: 600,
+                fontSize: '0.82rem',
+                display: 'inline-flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                gap: '0.35rem',
+              }}
+            >
+              <UserPlus size={14} /> Sign Up
+            </button>
+          </div>
+        )}
 
         {/* Body */}
         <div
           className="scrollable-drawer-body"
-          style={{ padding: '1.2rem 1.35rem 1.4rem' }}
+          style={{ padding: '1.15rem 1.25rem 1.35rem' }}
         >
           {feedback && (
             <div
               style={{
-                padding: '0.7rem 0.95rem',
+                padding: '0.65rem 0.9rem',
                 borderRadius: 'var(--radius-sm)',
-                marginBlockEnd: '1rem',
+                marginBlockEnd: '0.9rem',
                 background:
                   feedback.type === 'error'
                     ? 'var(--danger-bg)'
@@ -205,7 +234,7 @@ export default function AuthModal({
                   feedback.type === 'error'
                     ? 'var(--danger)'
                     : 'var(--success)',
-                fontSize: '0.85rem',
+                fontSize: '0.82rem',
                 fontWeight: 600,
               }}
             >
@@ -213,19 +242,21 @@ export default function AuthModal({
             </div>
           )}
 
-          {mode === 'signin' ? (
+          {mode === 'signin' || mode === 'admin' ? (
             /* Sign-In Form following modern-web-guidance autofill-sign-in-form */
             <form
               onSubmit={handleSignIn}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '1rem',
+                gap: '0.9rem',
               }}
             >
               <div className="form-field">
                 <label className="form-label" htmlFor="signin-phone">
-                  Phone Number *
+                  {mode === 'admin'
+                    ? 'Management Phone Number *'
+                    : 'Your Phone Number *'}
                 </label>
                 <input
                   id="signin-phone"
@@ -235,7 +266,9 @@ export default function AuthModal({
                   autoComplete="username"
                   enterKeyHint="next"
                   required
-                  placeholder="e.g. 0616806679"
+                  placeholder={
+                    mode === 'admin' ? 'e.g. 0616806679' : 'e.g. 0712 345 678'
+                  }
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="form-input"
@@ -254,11 +287,11 @@ export default function AuthModal({
                     autoComplete="current-password"
                     enterKeyHint="done"
                     required
-                    placeholder="Enter your password"
+                    placeholder="Enter password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="form-input"
-                    style={{ paddingInlineEnd: '2.8rem' }}
+                    style={{ paddingInlineEnd: '2.6rem' }}
                   />
                   <button
                     type="button"
@@ -266,7 +299,7 @@ export default function AuthModal({
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     style={{
                       position: 'absolute',
-                      right: '0.75rem',
+                      right: '0.7rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       background: 'transparent',
@@ -276,55 +309,37 @@ export default function AuthModal({
                       placeContent: 'center',
                     }}
                   >
-                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
 
               <button
                 type="submit"
-                className="btn-primary"
-                style={{ inlineSize: '100%', marginTop: '0.25rem' }}
+                className={mode === 'admin' ? 'btn-gold' : 'btn-primary'}
+                style={{ inlineSize: '100%', marginTop: '0.2rem' }}
               >
-                <UserCheck size={17} />
-                <span>Sign In</span>
+                {mode === 'admin' ? (
+                  <>
+                    <ShieldCheck size={15} />
+                    <span>Enter Management Portal</span>
+                  </>
+                ) : (
+                  <>
+                    <UserCheck size={15} />
+                    <span>Sign In</span>
+                  </>
+                )}
               </button>
-
-              <div
-                style={{
-                  marginTop: '0.5rem',
-                  padding: '0.8rem',
-                  borderRadius: 'var(--radius-sm)',
-                  background: 'var(--bg-secondary)',
-                  border: '1px solid var(--gold-border)',
-                  fontSize: '0.78rem',
-                  color: 'var(--text-secondary)',
-                  display: 'flex',
-                  alignItems: 'flex-start',
-                  gap: '0.5rem',
-                }}
-              >
-                <ShieldCheck
-                  size={16}
-                  color="var(--brand-color)"
-                  style={{ flexShrink: 0, marginTop: '0.1rem' }}
-                />
-                <div>
-                  <strong>Management Members:</strong> Log in with your
-                  registered admin phone number (<code>0616806679</code> or{' '}
-                  <code>0612509403</code>) and password to open the Admin SaaS
-                  Dashboard.
-                </div>
-              </div>
             </form>
           ) : (
-            /* Student Self-Registration Form */
+            /* Client Self-Registration Form */
             <form
               onSubmit={handleSignUp}
               style={{
                 display: 'flex',
                 flexDirection: 'column',
-                gap: '0.95rem',
+                gap: '0.85rem',
               }}
             >
               <div className="form-field">
@@ -366,7 +381,7 @@ export default function AuthModal({
 
               <div className="form-field">
                 <label className="form-label" htmlFor="signup-hostel">
-                  Hostel or Campus Residence
+                  Hostel or Residence
                 </label>
                 <input
                   id="signup-hostel"
@@ -397,7 +412,7 @@ export default function AuthModal({
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="form-input"
-                    style={{ paddingInlineEnd: '2.8rem' }}
+                    style={{ paddingInlineEnd: '2.6rem' }}
                   />
                   <button
                     type="button"
@@ -405,7 +420,7 @@ export default function AuthModal({
                     aria-label={showPassword ? 'Hide password' : 'Show password'}
                     style={{
                       position: 'absolute',
-                      right: '0.75rem',
+                      right: '0.7rem',
                       top: '50%',
                       transform: 'translateY(-50%)',
                       background: 'transparent',
@@ -415,7 +430,7 @@ export default function AuthModal({
                       placeContent: 'center',
                     }}
                   >
-                    {showPassword ? <EyeOff size={17} /> : <Eye size={17} />}
+                    {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
                 </div>
               </div>
@@ -423,10 +438,10 @@ export default function AuthModal({
               <button
                 type="submit"
                 className="btn-primary"
-                style={{ inlineSize: '100%', marginTop: '0.25rem' }}
+                style={{ inlineSize: '100%', marginTop: '0.2rem' }}
               >
-                <Sparkles size={17} />
-                <span>Create Student Account</span>
+                <Sparkles size={15} />
+                <span>Create Account</span>
               </button>
             </form>
           )}
@@ -435,4 +450,3 @@ export default function AuthModal({
     </div>
   );
 }
-

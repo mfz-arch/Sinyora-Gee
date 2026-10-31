@@ -220,26 +220,38 @@ button {
   container-name: hero-box;
 }
 
-/* Metallic Gold Title for SINYORA - GEE (Large & Wide like the hand-drawn template) */
+/* Metallic Gold Title for SINYORA GEE (Thick, Bold, Stylized Freestyle Slant) */
 .hero-brand-title-gold {
-  font-size: clamp(2.35rem, 7.8vw, 6.2rem);
-  font-weight: 800;
-  letter-spacing: 0.07em;
+  font-family:
+    'Cinzel Decorative',
+    'Playfair Display',
+    Georgia,
+    serif;
+  font-size: clamp(2.45rem, 8vw, 6.4rem);
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
   line-height: 1.08;
+  display: inline-block;
+  padding-inline: 0.2em;
+  transform: skewX(-7deg);
   background: linear-gradient(
     180deg,
-    #fff6d1 0%,
-    #f5d67b 38%,
-    #d4af37 72%,
-    #aa7c11 100%
+    #fff9de 0%,
+    #f9df87 34%,
+    #d4af37 68%,
+    #9f720d 100%
   );
   -webkit-background-clip: text;
   background-clip: text;
   color: #d4af37;
   -webkit-text-fill-color: transparent;
-  filter: drop-shadow(0 5px 22px rgba(0, 0, 0, 0.65));
+  -webkit-text-stroke: 1px rgba(255, 244, 198, 0.35);
+  filter:
+    drop-shadow(3px 4px 0px rgba(82, 48, 5, 0.85))
+    drop-shadow(0 8px 24px rgba(0, 0, 0, 0.7));
 }
 
 .hero-brand-subtitle {

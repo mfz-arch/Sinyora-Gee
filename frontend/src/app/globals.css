@@ -403,26 +403,91 @@ button {
 }
 
 @media (max-width: 600px) {
+  /* 1. Give breathing room between Logo, Management & Signup/Signin on Phone */
+  .header-inner {
+    padding-block: 0.35rem 0.4rem;
+    row-gap: 0.35rem;
+    column-gap: 0.75rem;
+  }
+
+  .sinyora-logo-md {
+    inline-size: 116px !important;
+    block-size: 47px !important;
+  }
+
+  .header-actions-area {
+    gap: 0.45rem;
+  }
+
+  .header-actions-area .nav-box-btn {
+    padding: 0.34rem 0.68rem;
+    font-size: 0.72rem;
+    border-radius: 999px;
+  }
+
+  .header-actions-area .nav-box-btn svg {
+    display: none;
+  }
+
+  .header-nav-area {
+    padding-top: 0.32rem;
+    gap: 1.35rem;
+    font-size: 0.79rem;
+  }
+
+  /* 2. Zoom out background image & move Hero text + buttons higher up on Phone */
   .hero-skincare-backdrop {
-    min-block-size: calc(100dvh + 135px);
-    margin-block-start: -128px;
-    padding-block: calc(128px + 1.5rem) 6.5rem;
+    min-block-size: calc(100dvh + 75px);
+    margin-block-start: -96px;
+    padding-block: calc(96px + 2.1rem) 5.5rem;
+    justify-content: flex-start;
+    background-color: #180d13;
+    background-image:
+      linear-gradient(
+        180deg,
+        #180d13 0%,
+        rgba(24, 13, 19, 0.38) 16%,
+        rgba(24, 13, 19, 0.56) 68%,
+        #180d13 90%
+      ),
+      url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1400&q=85');
+    background-size: 100% 100%, 172% auto;
+    background-position: center center, 52% 24%;
+    background-repeat: no-repeat;
+  }
+
+  .hero-skincare-backdrop .hero-fluid-container {
+    gap: 0.75rem !important;
+  }
+
+  .hero-skincare-backdrop .hero-brand-title-gold {
+    font-size: clamp(2.05rem, 8.6vw, 2.75rem);
+  }
+
+  .hero-skincare-backdrop .hero-brand-subtitle {
+    font-size: 0.8rem;
+    letter-spacing: 0.2em;
+  }
+
+  .hero-skincare-backdrop p {
+    margin-block: 0.15rem 0.65rem !important;
+    font-size: 0.92rem !important;
+    line-height: 1.58 !important;
   }
 
   .hero-skincare-backdrop::after {
-    block-size: 120px;
+    block-size: 115px;
+  }
+
+  .hero-cta-row {
+    gap: 0.5rem;
   }
 
   .hero-cta-row .btn-gold,
   .hero-cta-row .btn-primary,
   .hero-cta-row .btn-hero-outline {
-    padding: 0.48rem 0.92rem;
-    font-size: 0.78rem;
-  }
-
-  .nav-box-btn {
-    padding: 0.38rem 0.72rem;
-    font-size: 0.74rem;
+    padding: 0.46rem 0.88rem;
+    font-size: 0.76rem;
   }
 }
 

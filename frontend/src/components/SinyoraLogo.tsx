@@ -25,6 +25,7 @@ export default function SinyoraLogo({ size = 'md' }: SinyoraLogoProps) {
       aria-label="Sinyora Gee — Skincare • Makeup • Beauty"
     >
       <svg
+        className={`sinyora-logo-svg sinyora-logo-${size}`}
         width={dimensions.width}
         height={dimensions.height}
         viewBox="0 0 300 126"

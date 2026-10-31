@@ -104,16 +104,16 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* 2. Main Header matching the exact hand-drawn template */}
+      {/* 2. Main Header sitting directly over the skincare background */}
       <header
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 50,
-          background:
-            'linear-gradient(90deg, #1a0f14 0%, #2b1520 50%, #1a0f14 100%)',
-          borderBottom: '1px solid rgba(212, 175, 55, 0.45)',
-          boxShadow: '0 6px 24px rgba(0, 0, 0, 0.28)',
+          background: 'rgba(18, 10, 14, 0.32)',
+          backdropFilter: 'blur(8px)',
+          WebkitBackdropFilter: 'blur(8px)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.32)',
         }}
       >
         <div className="page-shell header-inner">

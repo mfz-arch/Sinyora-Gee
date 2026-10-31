@@ -358,10 +358,37 @@ button {
   inline-size: 100%;
 }
 
+/* Centered Skincare Hero Backdrop filling entire screen including header area */
+.hero-skincare-backdrop {
+  position: relative;
+  inline-size: 100%;
+  min-block-size: calc(100dvh - 30px);
+  margin-block-start: -102px;
+  padding-block: calc(102px + 2.5rem) 3.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  background-color: #1c1016;
+  background-image:
+    radial-gradient(
+      circle at 50% 42%,
+      rgba(42, 20, 31, 0.5) 0%,
+      rgba(18, 10, 15, 0.82) 78%
+    ),
+    url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1920&q=85');
+  background-size: cover;
+  background-position: center;
+  border-bottom: 2px solid var(--gold-primary);
+  overflow: clip;
+}
+
 @media (max-width: 600px) {
   .hero-skincare-backdrop {
-    min-block-size: 440px;
-    padding-block: 2.5rem 2.8rem;
+    min-block-size: calc(100dvh - 30px);
+    margin-block-start: -125px;
+    padding-block: calc(125px + 1.5rem) 4.5rem;
   }
 
   .hero-cta-row .btn-gold,
@@ -375,31 +402,6 @@ button {
     padding: 0.38rem 0.72rem;
     font-size: 0.74rem;
   }
-}
-
-/* Centered Skincare Hero Backdrop matching wireframe template */
-.hero-skincare-backdrop {
-  position: relative;
-  inline-size: 100%;
-  min-block-size: clamp(480px, 75dvh, 680px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  padding-block: clamp(3.2rem, 7vw, 5.5rem);
-  background-color: #1c1016;
-  background-image:
-    radial-gradient(
-      circle at 50% 38%,
-      rgba(42, 20, 31, 0.55) 0%,
-      rgba(18, 10, 15, 0.85) 75%
-    ),
-    url('https://images.unsplash.com/photo-1570172619644-dfd03ed5d881?auto=format&fit=crop&w=1920&q=85');
-  background-size: cover;
-  background-position: center;
-  border-bottom: 2px solid var(--gold-primary);
-  overflow: clip;
 }
 
 /* Modern Web Guidance: css-layout subgrid for aligned cards on desktop & mobile */

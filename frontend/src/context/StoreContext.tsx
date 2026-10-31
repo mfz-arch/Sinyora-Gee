@@ -60,6 +60,10 @@ interface StoreContextType {
   updateOrderStatus: (id: string, status: OrderStatus) => void;
   // Admin Catalog actions
   addProduct: (product: Omit<SpaProduct, 'id' | 'createdAt'>) => void;
+  updateProduct: (
+    id: string,
+    updates: Partial<Omit<SpaProduct, 'id' | 'createdAt'>>
+  ) => void;
   deleteProduct: (id: string) => void;
   addService: (service: Omit<SpaService, 'id'>) => void;
   updateServicePrice: (id: string, price: number) => void;
@@ -327,6 +331,17 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     } catch {}
   };
 
+  const updateProduct = (
+    id: string,
+    updates: Partial<Omit<SpaProduct, 'id' | 'createdAt'>>
+  ) => {
+    const next = products.map((p) => (p.id === id ? { ...p, ...updates } : p));
+    setProducts(next);
+    try {
+      localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(next));
+    } catch {}
+  };
+
   const deleteProduct = (id: string) => {
     const next = products.filter((p) => p.id !== id);
     setProducts(next);
@@ -390,6 +405,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
         createProductOrder,
         updateOrderStatus,
         addProduct,
+        updateProduct,
         deleteProduct,
         addService,
         updateServicePrice,

@@ -15,6 +15,8 @@ import {
   Palette,
   ArrowLeft,
   Upload,
+  Camera,
+  QrCode,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import {
@@ -29,15 +31,18 @@ import {
   ServiceCategoryId,
 } from '@/types';
 import { formatTsh } from '@/utils/format';
+import { compressProductImage } from '@/utils/imageUpload';
 
 interface AdminDashboardProps {
   initialTab?: 'bookings' | 'products' | 'services' | 'orders' | 'clients';
   onBackToStorefront: () => void;
+  onOpenQrModal: () => void;
 }
 
 export default function AdminDashboard({
   initialTab = 'bookings',
   onBackToStorefront,
+  onOpenQrModal,
 }: AdminDashboardProps) {
   const {
     currentUser,
@@ -47,6 +52,7 @@ export default function AdminDashboard({
     updateBookingStatus,
     products,
     addProduct,
+    updateProduct,
     deleteProduct,
     services,
     addService,
@@ -81,16 +87,23 @@ export default function AdminDashboard({
   const [srvBadge, setSrvBadge] = useState('New Treatment');
   const [srvDesc, setSrvDesc] = useState('');
 
-  const handleImageFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileUpload = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      if (typeof reader.result === 'string') {
-        setProdImage(reader.result);
-      }
-    };
-    reader.readAsDataURL(file);
+    const compressed = await compressProductImage(file);
+    setProdImage(compressed);
+  };
+
+  const handleUpdateExistingProductPhoto = async (
+    productId: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const compressed = await compressProductImage(file);
+    updateProduct(productId, { image: compressed });
   };
 
   const handleAddProduct = (e: React.FormEvent) => {
@@ -176,14 +189,29 @@ export default function AdminDashboard({
             </p>
           </div>
 
-          <button
-            type="button"
-            onClick={onBackToStorefront}
-            className="btn-gold"
-          >
-            <ArrowLeft size={16} />
-            <span>Back to Client Storefront</span>
-          </button>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.65rem' }}>
+            <button
+              type="button"
+              onClick={onOpenQrModal}
+              className="btn-outline"
+              style={{
+                borderColor: 'var(--gold-primary)',
+                color: '#f5e6b8',
+              }}
+            >
+              <QrCode size={16} />
+              <span>Studio QR Code</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={onBackToStorefront}
+              className="btn-gold"
+            >
+              <ArrowLeft size={16} />
+              <span>Back to Client Storefront</span>
+            </button>
+          </div>
         </div>
 
         {/* KPI Summary Cards */}
@@ -688,7 +716,7 @@ export default function AdminDashboard({
                             marginInlineEnd: '0.3rem',
                           }}
                         />
-                        Upload Photo from Phone / PC
+                        Upload Product Photo (Phone Camera / Gallery / PC)
                       </label>
                       <input
                         type="file"
@@ -703,12 +731,48 @@ export default function AdminDashboard({
                       <label className="form-label">Or Paste Image URL</label>
                       <input
                         type="url"
-                        value={prodImage}
+                        value={prodImage.startsWith('data:') ? '' : prodImage}
+                        placeholder="https://..."
                         onChange={(e) => setProdImage(e.target.value)}
                         className="form-input"
                       />
                     </div>
                   </div>
+
+                  {/* Live Product Picture Preview */}
+                  {prodImage && (
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.9rem',
+                        padding: '0.65rem 0.85rem',
+                        borderRadius: 'var(--radius-sm)',
+                        background: 'var(--bg-surface)',
+                        border: '1px solid var(--gold-border)',
+                      }}
+                    >
+                      <img
+                        src={prodImage}
+                        alt="Selected product preview"
+                        style={{
+                          inlineSize: '76px',
+                          blockSize: '60px',
+                          objectFit: 'cover',
+                          borderRadius: '8px',
+                          border: '1px solid var(--gold-primary)',
+                        }}
+                      />
+                      <div style={{ fontSize: '0.8rem' }}>
+                        <strong style={{ color: 'var(--text-primary)' }}>
+                          Live Product Photo Preview
+                        </strong>
+                        <div style={{ color: 'var(--text-secondary)' }}>
+                          Ready to publish to Cosmetics Shop (Cloudinary-ready)
+                        </div>
+                      </div>
+                    </div>
+                  )}
 
                   <div className="form-field">
                     <label className="form-label">Product Description</label>
@@ -754,38 +818,88 @@ export default function AdminDashboard({
                         key={p.id}
                         style={{
                           display: 'flex',
+                          flexWrap: 'wrap',
                           justifyContent: 'space-between',
                           alignItems: 'center',
+                          gap: '0.75rem',
                           padding: '0.8rem 1rem',
                           borderRadius: 'var(--radius-sm)',
                           background: 'var(--bg-secondary)',
                           border: '1px solid var(--gold-border)',
                         }}
                       >
-                        <div>
-                          <strong>{p.name}</strong>{' '}
-                          <span className="rose-pill-badge">{p.tag}</span>
-                          <div
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.85rem',
+                          }}
+                        >
+                          <img
+                            src={p.image}
+                            alt={p.name}
                             style={{
-                              fontSize: '0.82rem',
-                              color: 'var(--text-secondary)',
+                              inlineSize: '64px',
+                              blockSize: '52px',
+                              objectFit: 'cover',
+                              borderRadius: '8px',
+                              border: '1px solid var(--gold-primary)',
+                              flexShrink: 0,
                             }}
-                          >
-                            {formatTsh(p.price)} • Stock: {p.stock}
+                          />
+                          <div>
+                            <strong>{p.name}</strong>{' '}
+                            <span className="rose-pill-badge">{p.tag}</span>
+                            <div
+                              style={{
+                                fontSize: '0.82rem',
+                                color: 'var(--text-secondary)',
+                              }}
+                            >
+                              {formatTsh(p.price)} • Stock: {p.stock}
+                            </div>
                           </div>
                         </div>
 
-                        <button
-                          type="button"
-                          onClick={() => deleteProduct(p.id)}
-                          className="btn-outline"
+                        <div
                           style={{
-                            padding: '0.4rem 0.7rem',
-                            color: 'var(--danger)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            gap: '0.5rem',
                           }}
                         >
-                          <Trash2 size={15} />
-                        </button>
+                          <label
+                            className="btn-outline"
+                            style={{
+                              padding: '0.38rem 0.75rem',
+                              fontSize: '0.76rem',
+                              cursor: 'pointer',
+                            }}
+                          >
+                            <Camera size={14} />
+                            <span>Change Photo</span>
+                            <input
+                              type="file"
+                              accept="image/*"
+                              onChange={(e) =>
+                                handleUpdateExistingProductPhoto(p.id, e)
+                              }
+                              style={{ display: 'none' }}
+                            />
+                          </label>
+
+                          <button
+                            type="button"
+                            onClick={() => deleteProduct(p.id)}
+                            className="btn-outline"
+                            style={{
+                              padding: '0.4rem 0.7rem',
+                              color: 'var(--danger)',
+                            }}
+                          >
+                            <Trash2 size={15} />
+                          </button>
+                        </div>
                       </div>
                     ))}
                   </div>

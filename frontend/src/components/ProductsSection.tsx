@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import {
   ShoppingBag,
   Sparkles,
@@ -9,6 +9,11 @@ import {
   Droplets,
   ShieldCheck,
   MessageCircle,
+  Camera,
+  ImagePlus,
+  Trash2,
+  QrCode,
+  X,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import {
@@ -18,24 +23,53 @@ import {
 } from '@/data/initialData';
 import { ProductCategoryId, ProductTag } from '@/types';
 import { formatTsh } from '@/utils/format';
+import { compressProductImage } from '@/utils/imageUpload';
 
 interface ProductsSectionProps {
   onOpenAdminProducts: () => void;
   onOpenClientPortal: () => void;
   onOpenAuth: () => void;
+  onOpenQrModal: () => void;
 }
+
+const DEFAULT_SAMPLE_IMAGE =
+  'https://images.unsplash.com/photo-1608248597359-0e6d526a6828?auto=format&fit=crop&w=900&q=80';
 
 export default function ProductsSection({
   onOpenAdminProducts,
   onOpenClientPortal,
   onOpenAuth,
+  onOpenQrModal,
 }: ProductsSectionProps) {
-  const { products, addToCart, currentUser } = useStore();
+  const {
+    products,
+    addToCart,
+    currentUser,
+    addProduct,
+    updateProduct,
+    deleteProduct,
+  } = useStore();
 
   const [selectedCategory, setSelectedCategory] = useState<
     ProductCategoryId | 'all'
   >('all');
   const [selectedTag, setSelectedTag] = useState<ProductTag | 'all'>('all');
+
+  // Inline Admin Quick-Upload Drawer inside Cosmetics Shop
+  const [showQuickAdd, setShowQuickAdd] = useState(false);
+  const [prodName, setProdName] = useState('');
+  const [prodCategory, setProdCategory] =
+    useState<ProductCategoryId>('facial-products');
+  const [prodTag, setProdTag] = useState<ProductTag>('Oils');
+  const [prodPrice, setProdPrice] = useState('15000');
+  const [prodStock, setProdStock] = useState('10');
+  const [prodDesc, setProdDesc] = useState('');
+  const [prodImage, setProdImage] = useState<string>('');
+  const [isUploadingImg, setIsUploadingImg] = useState(false);
+
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  const isAdmin = currentUser?.role === 'admin';
 
   const filteredProducts = products.filter((p) => {
     const matchCategory =
@@ -43,6 +77,50 @@ export default function ProductsSection({
     const matchTag = selectedTag === 'all' || p.tag === selectedTag;
     return matchCategory && matchTag;
   });
+
+  const handleSelectNewPhoto = async (
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsUploadingImg(true);
+    try {
+      const compressed = await compressProductImage(file);
+      setProdImage(compressed);
+    } finally {
+      setIsUploadingImg(false);
+    }
+  };
+
+  const handleReplaceCardPhoto = async (
+    productId: string,
+    e: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const compressed = await compressProductImage(file);
+    updateProduct(productId, { image: compressed });
+  };
+
+  const handleQuickPublishProduct = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!prodName.trim()) return;
+    addProduct({
+      name: prodName.trim(),
+      categoryId: prodCategory,
+      tag: prodTag,
+      price: Number(prodPrice) || 0,
+      stock: Number(prodStock) || 0,
+      description:
+        prodDesc.trim() ||
+        `Authentic ${prodTag.toLowerCase()} curated by SINYORA GEE.`,
+      image: prodImage.trim() || DEFAULT_SAMPLE_IMAGE,
+    });
+    setProdName('');
+    setProdDesc('');
+    setProdImage('');
+    setShowQuickAdd(false);
+  };
 
   return (
     <section
@@ -184,7 +262,7 @@ export default function ProductsSection({
             justifyContent: 'space-between',
             flexWrap: 'wrap',
             gap: '0.75rem',
-            marginBlockEnd: '2rem',
+            marginBlockEnd: '1.5rem',
             padding: '0.75rem 1rem',
             background: 'var(--bg-surface)',
             borderRadius: 'var(--radius-md)',
@@ -250,18 +328,329 @@ export default function ProductsSection({
             })}
           </div>
 
-          {currentUser?.role === 'admin' && (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
             <button
               type="button"
-              onClick={onOpenAdminProducts}
-              className="btn-gold"
-              style={{ padding: '0.5rem 1rem', fontSize: '0.82rem' }}
+              onClick={onOpenQrModal}
+              className="btn-outline"
+              style={{ padding: '0.48rem 0.9rem', fontSize: '0.8rem' }}
             >
-              <PlusCircle size={15} />
-              <span>Add Products in Admin</span>
+              <QrCode size={15} />
+              <span>Webapp QR Code</span>
             </button>
-          )}
+
+            {isAdmin && (
+              <button
+                type="button"
+                onClick={() => setShowQuickAdd((prev) => !prev)}
+                className="btn-gold"
+                style={{ padding: '0.48rem 0.95rem', fontSize: '0.82rem' }}
+              >
+                <Camera size={15} />
+                <span>
+                  {showQuickAdd
+                    ? 'Close Upload Form'
+                    : '+ Add Product (Picture & Price)'}
+                </span>
+              </button>
+            )}
+          </div>
         </div>
+
+        {/* Inline Admin Quick-Upload Form with Live Product Picture Preview */}
+        {isAdmin && showQuickAdd && (
+          <form
+            onSubmit={handleQuickPublishProduct}
+            style={{
+              background: 'var(--bg-surface)',
+              border: '2px solid var(--gold-primary)',
+              borderRadius: 'var(--radius-lg)',
+              padding: 'clamp(1.15rem, 3vw, 1.75rem)',
+              marginBlockEnd: '2rem',
+              boxShadow: 'var(--shadow-md)',
+            }}
+          >
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                marginBlockEnd: '1rem',
+              }}
+            >
+              <div>
+                <span className="gold-shimmer-badge">
+                  Admin Cosmetics Studio • Cloudinary Ready
+                </span>
+                <h3 style={{ fontSize: '1.25rem', marginTop: '0.3rem' }}>
+                  Add New Product with Picture, Name &amp; Price
+                </h3>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setShowQuickAdd(false)}
+                aria-label="Close product form"
+                style={{
+                  inlineSize: '32px',
+                  blockSize: '32px',
+                  borderRadius: '50%',
+                  border: '1px solid var(--gold-border)',
+                  background: 'var(--bg-secondary)',
+                  display: 'grid',
+                  placeContent: 'center',
+                }}
+              >
+                <X size={16} />
+              </button>
+            </div>
+
+            <div
+              style={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))',
+                gap: '1.25rem',
+                alignItems: 'start',
+              }}
+            >
+              {/* Left Column: Interactive Picture Upload Box */}
+              <div>
+                <label className="form-label" style={{ marginBlockEnd: '0.4rem' }}>
+                  Product Picture (Phone Camera / Gallery / PC) *
+                </label>
+
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  onChange={handleSelectNewPhoto}
+                  style={{ display: 'none' }}
+                />
+
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  role="button"
+                  tabIndex={0}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                      fileInputRef.current?.click();
+                    }
+                  }}
+                  style={{
+                    position: 'relative',
+                    aspectRatio: '4 / 3',
+                    borderRadius: 'var(--radius-md)',
+                    border: '2px dashed var(--gold-primary)',
+                    background: 'var(--bg-secondary)',
+                    overflow: 'clip',
+                    cursor: 'pointer',
+                    display: 'grid',
+                    placeContent: 'center',
+                    textAlign: 'center',
+                    padding: prodImage ? '0' : '1.25rem',
+                  }}
+                >
+                  {prodImage ? (
+                    <>
+                      <img
+                        src={prodImage}
+                        alt="Product preview"
+                        style={{
+                          inlineSize: '100%',
+                          blockSize: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                      <span
+                        style={{
+                          position: 'absolute',
+                          bottom: '0.6rem',
+                          right: '0.6rem',
+                          background: 'rgba(20, 8, 14, 0.85)',
+                          color: '#f5e6b8',
+                          padding: '0.35rem 0.75rem',
+                          borderRadius: '999px',
+                          fontSize: '0.75rem',
+                          fontWeight: 700,
+                          border: '1px solid var(--gold-primary)',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.35rem',
+                        }}
+                      >
+                        <Camera size={13} /> Change Photo
+                      </span>
+                    </>
+                  ) : (
+                    <div style={{ display: 'grid', gap: '0.45rem', placeItems: 'center' }}>
+                      <div
+                        style={{
+                          inlineSize: '48px',
+                          blockSize: '48px',
+                          borderRadius: '50%',
+                          background: 'var(--brand-soft)',
+                          color: 'var(--brand-color)',
+                          display: 'grid',
+                          placeContent: 'center',
+                        }}
+                      >
+                        <ImagePlus size={22} />
+                      </div>
+                      <div style={{ fontWeight: 700, fontSize: '0.88rem' }}>
+                        {isUploadingImg
+                          ? 'Optimizing Photo...'
+                          : 'Tap to Select or Take Product Photo'}
+                      </div>
+                      <div
+                        style={{
+                          fontSize: '0.74rem',
+                          color: 'var(--text-secondary)',
+                        }}
+                      >
+                        Auto-compressed for fast loading &amp; Cloudinary storage
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ marginTop: '0.55rem' }}>
+                  <input
+                    type="url"
+                    placeholder="Or paste an image URL..."
+                    value={prodImage.startsWith('data:') ? '' : prodImage}
+                    onChange={(e) => setProdImage(e.target.value)}
+                    className="form-input"
+                    style={{ fontSize: '0.8rem', padding: '0.45rem 0.7rem' }}
+                  />
+                </div>
+              </div>
+
+              {/* Right Column: Product Name, Price, Section, Stock */}
+              <div style={{ display: 'grid', gap: '0.8rem' }}>
+                <div className="form-field">
+                  <label className="form-label">Product Name *</label>
+                  <input
+                    type="text"
+                    required
+                    placeholder="e.g. Vitamin C Brightening Facial Serum"
+                    value={prodName}
+                    onChange={(e) => setProdName(e.target.value)}
+                    className="form-input"
+                  />
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '0.75rem',
+                  }}
+                >
+                  <div className="form-field">
+                    <label className="form-label">Price (Tsh) *</label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      step={500}
+                      value={prodPrice}
+                      onChange={(e) => setProdPrice(e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-label">Stock Quantity *</label>
+                    <input
+                      type="number"
+                      required
+                      min={0}
+                      value={prodStock}
+                      onChange={(e) => setProdStock(e.target.value)}
+                      className="form-input"
+                    />
+                  </div>
+                </div>
+
+                <div
+                  style={{
+                    display: 'grid',
+                    gridTemplateColumns: '1fr 1fr',
+                    gap: '0.75rem',
+                  }}
+                >
+                  <div className="form-field">
+                    <label className="form-label">Shop Section Tag *</label>
+                    <select
+                      value={prodTag}
+                      onChange={(e) =>
+                        setProdTag(e.target.value as ProductTag)
+                      }
+                      className="form-select"
+                    >
+                      {PRODUCT_TAGS.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label className="form-label">Skincare Category *</label>
+                    <select
+                      value={prodCategory}
+                      onChange={(e) =>
+                        setProdCategory(e.target.value as ProductCategoryId)
+                      }
+                      className="form-select"
+                    >
+                      {PRODUCT_CATEGORIES.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.title}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                </div>
+
+                <div className="form-field">
+                  <label className="form-label">Short Description</label>
+                  <textarea
+                    rows={2}
+                    placeholder="Skin benefits, key ingredients, or how to use..."
+                    value={prodDesc}
+                    onChange={(e) => setProdDesc(e.target.value)}
+                    className="form-textarea"
+                  />
+                </div>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.65rem',
+                    marginTop: '0.25rem',
+                  }}
+                >
+                  <button type="submit" className="btn-primary">
+                    <PlusCircle size={17} />
+                    <span>Publish Product to Cosmetics Shop</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={onOpenAdminProducts}
+                    className="btn-outline"
+                  >
+                    <span>Open Full Admin Catalog</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+          </form>
+        )}
 
         {/* Blank State (Kept blank by default as requested, ready for Admin uploads) */}
         {filteredProducts.length === 0 ? (
@@ -319,8 +708,8 @@ export default function ProductsSection({
               <strong>Masks</strong>, <strong>Shampoos</strong>,{' '}
               <strong>Serums</strong>, <strong>Body Care</strong>, and{' '}
               <strong>Organic Skincare</strong> are set up and ready. Management
-              can upload products with photos and prices directly from the Admin
-              Portal.
+              can upload products with <strong>pictures, names, and prices</strong>{' '}
+              directly right here or in the Admin Portal.
             </p>
 
             <div
@@ -343,14 +732,14 @@ export default function ProductsSection({
                 <span>Ask Available Stock on WhatsApp</span>
               </a>
 
-              {currentUser?.role === 'admin' ? (
+              {isAdmin ? (
                 <button
                   type="button"
-                  onClick={onOpenAdminProducts}
+                  onClick={() => setShowQuickAdd(true)}
                   className="btn-gold"
                 >
-                  <PlusCircle size={17} />
-                  <span>Upload First Product Now</span>
+                  <Camera size={17} />
+                  <span>Upload Product (Picture + Name + Price)</span>
                 </button>
               ) : (
                 <button
@@ -417,6 +806,67 @@ export default function ProductsSection({
                         : 'Out of stock'}
                     </span>
                   </div>
+
+                  {/* Admin Direct Photo Replacement & Delete Overlay */}
+                  {isAdmin && (
+                    <div
+                      style={{
+                        position: 'absolute',
+                        bottom: '0.6rem',
+                        left: '0.6rem',
+                        right: '0.6rem',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        gap: '0.4rem',
+                      }}
+                    >
+                      <label
+                        style={{
+                          background: 'rgba(20, 8, 14, 0.86)',
+                          color: '#f5e6b8',
+                          padding: '0.32rem 0.7rem',
+                          borderRadius: '999px',
+                          fontSize: '0.72rem',
+                          fontWeight: 700,
+                          border: '1px solid var(--gold-primary)',
+                          cursor: 'pointer',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          gap: '0.3rem',
+                        }}
+                      >
+                        <Camera size={12} />
+                        <span>Change Photo</span>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) =>
+                            handleReplaceCardPhoto(product.id, e)
+                          }
+                          style={{ display: 'none' }}
+                        />
+                      </label>
+
+                      <button
+                        type="button"
+                        onClick={() => deleteProduct(product.id)}
+                        title="Remove product"
+                        style={{
+                          background: 'rgba(190, 18, 60, 0.9)',
+                          color: '#fff',
+                          border: 'none',
+                          borderRadius: '999px',
+                          padding: '0.32rem 0.6rem',
+                          display: 'inline-flex',
+                          alignItems: 'center',
+                          cursor: 'pointer',
+                        }}
+                      >
+                        <Trash2 size={13} />
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 <div style={{ padding: '1.1rem 1.25rem 0.5rem' }}>
@@ -496,4 +946,3 @@ export default function ProductsSection({
     </section>
   );
 }
-

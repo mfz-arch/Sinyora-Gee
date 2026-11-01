@@ -394,12 +394,12 @@ export const PRODUCT_TAGS: ProductTag[] = [
 export const INITIAL_PRODUCTS: SpaProduct[] = [];
 
 // Pre-configured Admin credentials requested by the user:
-// 1) 0616806679 -> Allah
-// 2) 0612509403 -> Allah
+// 1) 0616806679 -> GHARIBA ABDURAHMAN (Password: Allah)
+// 2) 0612509403 -> AIM'FIZ AHMED (Password: Allah)
 export const INITIAL_USERS: UserAccount[] = [
   {
     id: 'admin-sinyora-1',
-    name: 'Sinyora Gee',
+    name: 'GHARIBA ABDURAHMAN',
     phone: '0616806679',
     password: 'Allah',
     role: 'admin',
@@ -409,11 +409,11 @@ export const INITIAL_USERS: UserAccount[] = [
   },
   {
     id: 'admin-partner-2',
-    name: 'Management Director',
+    name: "AIM'FIZ AHMED",
     phone: '0612509403',
     password: 'Allah',
     role: 'admin',
-    title: 'Co-Founder & Operations',
+    title: 'Co-Founder & Management Director',
     hostel: 'Royal Hostel Management',
     createdAt: '2026-10-31T10:00:00.000Z',
   },

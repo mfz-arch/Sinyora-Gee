@@ -120,7 +120,7 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       const savedUsers = localStorage.getItem(STORAGE_KEYS.USERS);
       if (savedUsers) {
         const parsedUsers: UserAccount[] = JSON.parse(savedUsers);
-        // Ensure both mandatory admin accounts are always present
+        // Ensure both mandatory admin accounts always use latest names & credentials
         const merged = [...INITIAL_USERS];
         for (const u of parsedUsers) {
           if (!merged.some((admin) => admin.phone === u.phone)) {
@@ -128,10 +128,22 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
           }
         }
         setUsers(merged);
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(merged));
       }
 
       const savedCurrentUser = localStorage.getItem(STORAGE_KEYS.CURRENT_USER);
-      if (savedCurrentUser) setCurrentUser(JSON.parse(savedCurrentUser));
+      if (savedCurrentUser) {
+        const parsedCurrent: UserAccount = JSON.parse(savedCurrentUser);
+        const matchingAdmin = INITIAL_USERS.find(
+          (admin) => admin.phone === parsedCurrent.phone
+        );
+        const syncedUser = matchingAdmin || parsedCurrent;
+        setCurrentUser(syncedUser);
+        localStorage.setItem(
+          STORAGE_KEYS.CURRENT_USER,
+          JSON.stringify(syncedUser)
+        );
+      }
     } catch {
       // Fallback to defaults if storage unavailable
     }

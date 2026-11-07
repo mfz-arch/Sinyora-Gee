@@ -3,8 +3,6 @@
 import React, { useState } from 'react';
 import {
   Sparkles,
-  Check,
-  Plus,
   Calendar,
   Search,
   Crown,
@@ -23,7 +21,7 @@ export default function ServicesSection({
 }: ServicesSectionProps) {
   const {
     services,
-    selectedServicesForBooking,
+    clearBookingSelection,
     toggleServiceForBooking,
   } = useStore();
 
@@ -33,12 +31,8 @@ export default function ServicesSection({
   const [searchQuery, setSearchQuery] = useState('');
 
   const handleBookDirect = (service: SpaService) => {
-    const isAlreadySelected = selectedServicesForBooking.some(
-      (s) => s.id === service.id
-    );
-    if (!isAlreadySelected) {
-      toggleServiceForBooking(service);
-    }
+    clearBookingSelection();
+    toggleServiceForBooking(service);
     onOpenBooking();
   };
 
@@ -294,25 +288,9 @@ export default function ServicesSection({
 
                 {/* CSS Subgrid Service Cards */}
                 <div className="cards-subgrid-container">
-                  {categoryServices.map((srv) => {
-                    const isSelected = selectedServicesForBooking.some(
-                      (s) => s.id === srv.id
-                    );
-
-                    return (
-                      <article
-                        key={srv.id}
-                        className="subgrid-card"
-                        style={{
-                          borderColor: isSelected
-                            ? 'var(--brand-color)'
-                            : undefined,
-                          boxShadow: isSelected
-                            ? '0 0 0 2px var(--brand-color), var(--shadow-md)'
-                            : undefined,
-                        }}
-                      >
-                        {/* Row 1: Image & Top Badges */}
+                  {categoryServices.map((srv) => (
+                    <article key={srv.id} className="subgrid-card">
+                      {/* Row 1: Image & Top Badges */}
                         <div
                           style={{
                             position: 'relative',
@@ -441,108 +419,26 @@ export default function ServicesSection({
                           >
                             <button
                               type="button"
-                              onClick={() => toggleServiceForBooking(srv)}
-                              className={
-                                isSelected ? 'btn-gold' : 'btn-outline'
-                              }
-                              style={{
-                                padding: '0.5rem 0.85rem',
-                                fontSize: '0.8rem',
-                              }}
-                              title="Add or remove from multi-service booking"
-                            >
-                              {isSelected ? (
-                                <>
-                                  <Check size={14} /> Added
-                                </>
-                              ) : (
-                                <>
-                                  <Plus size={14} /> Select
-                                </>
-                              )}
-                            </button>
-
-                            <button
-                              type="button"
                               onClick={() => handleBookDirect(srv)}
                               className="btn-primary"
                               style={{
-                                padding: '0.5rem 0.95rem',
-                                fontSize: '0.8rem',
+                                padding: '0.55rem 1.15rem',
+                                fontSize: '0.82rem',
                               }}
                             >
-                              <Calendar size={14} /> Book
+                              <Calendar size={14} /> Book Treatment
                             </button>
                           </div>
                         </div>
                       </article>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* Floating Multi-Service Selection Bar when services are selected */}
-        {selectedServicesForBooking.length > 0 && (
-          <div
-            style={{
-              position: 'sticky',
-              bottom: '4.5rem',
-              zIndex: 45,
-              marginTop: '2rem',
-              background: 'var(--dark-surface)',
-              color: '#fffdf9',
-              padding: '0.95rem 1.35rem',
-              borderRadius: 'var(--radius-md)',
-              border: '2px solid var(--gold-primary)',
-              boxShadow: 'var(--shadow-lg)',
-              display: 'flex',
-              flexWrap: 'wrap',
-              alignItems: 'safe center',
-              justifyContent: 'space-between',
-              gap: '1rem',
-            }}
-          >
-            <div>
-              <div
-                style={{
-                  fontSize: '0.75rem',
-                  color: '#f5e6b8',
-                  fontWeight: 700,
-                  textTransform: 'uppercase',
-                  letterSpacing: '0.08em',
-                }}
-              >
-                {selectedServicesForBooking.length} Treatment(s) Selected
-              </div>
-              <div style={{ fontWeight: 700, fontSize: '1.05rem' }}>
-                Total Estimate:{' '}
-                <span style={{ color: '#f5e6b8' }}>
-                  {formatTsh(
-                    selectedServicesForBooking.reduce(
-                      (sum, s) => sum + s.price,
-                      0
-                    )
-                  )}
-                </span>
-              </div>
-            </div>
-
-            <button
-              type="button"
-              onClick={onOpenBooking}
-              className="btn-gold"
-              style={{ padding: '0.65rem 1.4rem' }}
-            >
-              <Calendar size={17} />
-              <span>Complete Booking Now</span>
-            </button>
+              );
+            })}
           </div>
-        )}
-      </div>
-    </section>
-  );
-}
+        </div>
+      </section>
+    );
+  }
 

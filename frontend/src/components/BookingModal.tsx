@@ -36,6 +36,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
     services,
     selectedServicesForBooking,
     toggleServiceForBooking,
+    clearBookingSelection,
     createBooking,
     currentUser,
   } = useStore();
@@ -105,6 +106,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
   const resetAndClose = () => {
     setCompletedBooking(null);
     setErrorMsg('');
+    clearBookingSelection();
     onClose();
   };
 

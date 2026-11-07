@@ -8,21 +8,15 @@ import {
   ShieldCheck,
   Calendar,
   MessageCircle,
-  QrCode,
 } from 'lucide-react';
 import { STUDIO_INFO } from '@/data/initialData';
 
 interface FooterProps {
   onOpenBooking: () => void;
   onOpenAuth: () => void;
-  onOpenQrModal: () => void;
 }
 
-export default function Footer({
-  onOpenBooking,
-  onOpenAuth,
-  onOpenQrModal,
-}: FooterProps) {
+export default function Footer({ onOpenBooking, onOpenAuth }: FooterProps) {
   return (
     <footer
       id="studio-location"
@@ -111,19 +105,6 @@ export default function Footer({
             >
               <Calendar size={17} />
               <span>Book Appointment</span>
-            </button>
-
-            <button
-              type="button"
-              onClick={onOpenQrModal}
-              className="btn-outline"
-              style={{
-                borderColor: 'var(--gold-primary)',
-                color: '#f5e6b8',
-              }}
-            >
-              <QrCode size={17} />
-              <span>Webapp QR Code</span>
             </button>
 
             <a

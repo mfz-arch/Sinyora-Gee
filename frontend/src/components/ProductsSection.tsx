@@ -12,7 +12,6 @@ import {
   Camera,
   ImagePlus,
   Trash2,
-  QrCode,
   X,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
@@ -29,7 +28,6 @@ interface ProductsSectionProps {
   onOpenAdminProducts: () => void;
   onOpenClientPortal: () => void;
   onOpenAuth: () => void;
-  onOpenQrModal: () => void;
 }
 
 const DEFAULT_SAMPLE_IMAGE =
@@ -39,7 +37,6 @@ export default function ProductsSection({
   onOpenAdminProducts,
   onOpenClientPortal,
   onOpenAuth,
-  onOpenQrModal,
 }: ProductsSectionProps) {
   const {
     products,
@@ -329,16 +326,6 @@ export default function ProductsSection({
           </div>
 
           <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            <button
-              type="button"
-              onClick={onOpenQrModal}
-              className="btn-outline"
-              style={{ padding: '0.48rem 0.9rem', fontSize: '0.8rem' }}
-            >
-              <QrCode size={15} />
-              <span>Webapp QR Code</span>
-            </button>
-
             {isAdmin && (
               <button
                 type="button"

@@ -33,7 +33,7 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
         {/* Centered Subtitle: LUXURY FACIAL & SPA */}
         <p className="hero-brand-subtitle">LUXURY FACIAL &amp; SPA</p>
 
-        {/* Wide Horizontal Description matching the hand-drawn wireframe */}
+        {/* Wide Horizontal Description */}
         <p
           style={{
             inlineSize: '100%',
@@ -42,15 +42,33 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
             fontSize: 'clamp(1rem, 1.55vw, 1.2rem)',
             color: '#fdf4f7',
             lineHeight: 1.75,
-            marginBlock: '0.35rem 1.1rem',
+            marginBlock: '0.35rem 0.25rem',
             textShadow: '0 2px 12px rgba(0, 0, 0, 0.65)',
           }}
         >
           Experience clinical-grade facial machines, Korean glass skin
           treatments, soothing full-body massage, flawless makeup and curated
-          skincare essentials — at{' '}
+          skincare essentials.
+        </p>
+
+        {/* Dedicated Line: Royal Hostel or Own Domicile */}
+        <p
+          style={{
+            inlineSize: '100%',
+            maxInlineSize: '680px',
+            marginInline: 'auto',
+            fontSize: 'clamp(0.95rem, 1.4vw, 1.1rem)',
+            color: '#fce8ee',
+            fontWeight: 600,
+            letterSpacing: '0.02em',
+            marginBlock: '0 1rem',
+            textShadow: '0 2px 12px rgba(0, 0, 0, 0.7)',
+          }}
+        >
+          Services done at{' '}
           <strong style={{ color: '#f7df8b' }}>{STUDIO_INFO.location}</strong>{' '}
-          or at your <strong>Home / Domicile</strong>.
+          or in the comfort of{' '}
+          <strong style={{ color: '#f7df8b' }}>your own domicile</strong>.
         </p>
 
         {/* Horizontal Row of 3 Buttons matching the hand-drawn template */}

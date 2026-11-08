@@ -60,7 +60,7 @@ export type PaymentMethod =
   | 'Tigo Pesa'
   | 'Airtel Money'
   | 'HaloPesa'
-  | 'Cash at Studio';
+  | 'Cash';
 
 export type BookingStatus = 'Pending' | 'Confirmed' | 'Completed' | 'Cancelled';
 

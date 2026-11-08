@@ -285,7 +285,7 @@ export default function ProductsSection({
             >
               <div>
                 <span className="gold-shimmer-badge">
-                  Admin Cosmetics Studio • Cloudinary Ready
+                  Admin Cosmetics Shop • Cloudinary Ready
                 </span>
                 <h3 style={{ fontSize: '1.25rem', marginTop: '0.3rem' }}>
                   Add New Product with Picture, Name &amp; Price

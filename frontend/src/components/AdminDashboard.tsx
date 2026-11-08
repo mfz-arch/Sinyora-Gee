@@ -200,7 +200,7 @@ export default function AdminDashboard({
               }}
             >
               <QrCode size={16} />
-              <span>Studio QR Code</span>
+              <span>Website QR Code</span>
             </button>
 
             <button

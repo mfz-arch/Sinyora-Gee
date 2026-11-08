@@ -28,7 +28,7 @@ const PAYMENT_METHODS: PaymentMethod[] = [
   'Tigo Pesa',
   'Airtel Money',
   'HaloPesa',
-  'Cash at Studio',
+  'Cash',
 ];
 
 export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
@@ -558,12 +558,76 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                     size={14}
                     style={{ display: 'inline', marginInlineEnd: '0.3rem' }}
                   />
-                  Your Hostel / Campus Location
+                  Service Location (At Royal Hostel or Home / Domicile Service)
                 </label>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.45rem',
+                    marginBlockEnd: '0.45rem',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setHostelOrRoom('Royal Hostel')}
+                    style={{
+                      padding: '0.35rem 0.8rem',
+                      borderRadius: '999px',
+                      border:
+                        hostelOrRoom === 'Royal Hostel'
+                          ? '1.5px solid var(--brand-color)'
+                          : '1px solid var(--gold-border)',
+                      background:
+                        hostelOrRoom === 'Royal Hostel'
+                          ? 'var(--brand-color)'
+                          : 'var(--bg-surface)',
+                      color:
+                        hostelOrRoom === 'Royal Hostel'
+                          ? '#fff'
+                          : 'var(--text-primary)',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                    }}
+                  >
+                    📍 Visit Royal Hostel
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (hostelOrRoom === 'Royal Hostel') {
+                        setHostelOrRoom('Domicile Service — ');
+                      }
+                    }}
+                    style={{
+                      padding: '0.35rem 0.8rem',
+                      borderRadius: '999px',
+                      border:
+                        hostelOrRoom !== 'Royal Hostel'
+                          ? '1.5px solid var(--brand-color)'
+                          : '1px solid var(--gold-border)',
+                      background:
+                        hostelOrRoom !== 'Royal Hostel'
+                          ? 'var(--brand-color)'
+                          : 'var(--bg-surface)',
+                      color:
+                        hostelOrRoom !== 'Royal Hostel'
+                          ? '#fff'
+                          : 'var(--text-primary)',
+                      fontSize: '0.76rem',
+                      fontWeight: 700,
+                    }}
+                  >
+                    🏠 Come to My Place (Domicile)
+                  </button>
+                </div>
+
                 <input
                   id="booking-hostel"
                   type="text"
-                  placeholder="e.g. Royal Hostel, Block B / Off-Campus"
+                  placeholder="e.g. Royal Hostel OR your Hostel / Room / Home for Domicile Service"
                   value={hostelOrRoom}
                   onChange={(e) => setHostelOrRoom(e.target.value)}
                   className="form-input"
@@ -624,7 +688,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                   })}
                 </div>
 
-                {paymentMethod !== 'Cash at Studio' ? (
+                {paymentMethod !== 'Cash' ? (
                   <div
                     style={{
                       background: 'var(--bg-surface)',
@@ -640,8 +704,7 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                         style={{ display: 'inline', marginInlineEnd: '0.3rem' }}
                       />
                       Send <strong>{paymentMethod}</strong> payment to official
-                      studio number: <strong>{STUDIO_INFO.phone}</strong>{' '}
-                      (SINYORA GEE).
+                      number: <strong>{STUDIO_INFO.phone}</strong> (SINYORA GEE).
                     </div>
                     <input
                       type="text"
@@ -660,7 +723,8 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                     }}
                   >
                     You will pay <strong>{formatTsh(totalPrice)}</strong> in cash
-                    upon arrival at <strong>{STUDIO_INFO.location}</strong>.
+                    during your session (at{' '}
+                    <strong>{STUDIO_INFO.location}</strong> or at your domicile).
                   </div>
                 )}
               </div>

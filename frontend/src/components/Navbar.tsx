@@ -54,7 +54,7 @@ export default function Navbar({
     },
     {
       icon: <MapPin size={13} color="#f7df8b" />,
-      text: STUDIO_INFO.location,
+      text: `${STUDIO_INFO.location} • Home / Domicile Service Available`,
     },
   ];
 

@@ -136,7 +136,7 @@ export default function ServicesSection({
             className="rose-pill-badge"
             style={{ marginBlockEnd: '0.55rem' }}
           >
-            <Sparkles size={13} /> Interactive Studio Price Flyer
+            <Sparkles size={13} /> Official Service &amp; Price Menu
           </span>
           <h2
             className="section-fluid-title"
@@ -149,7 +149,8 @@ export default function ServicesSection({
           </h2>
           <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
             Tap any service section below to view its treatments and book your
-            session at <strong>Royal Hostel</strong>.
+            session at <strong>Royal Hostel</strong> or request{' '}
+            <strong>Home / Domicile Service</strong>.
           </p>
         </div>
 

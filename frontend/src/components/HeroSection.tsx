@@ -48,8 +48,9 @@ export default function HeroSection({ onOpenBooking }: HeroSectionProps) {
         >
           Experience clinical-grade facial machines, Korean glass skin
           treatments, soothing full-body massage, flawless makeup and curated
-          skincare essentials — located at{' '}
-          <strong style={{ color: '#f7df8b' }}>{STUDIO_INFO.location}</strong>
+          skincare essentials — at{' '}
+          <strong style={{ color: '#f7df8b' }}>{STUDIO_INFO.location}</strong>{' '}
+          or at your <strong>Home / Domicile</strong>.
         </p>
 
         {/* Horizontal Row of 3 Buttons matching the hand-drawn template */}

@@ -89,10 +89,10 @@ export default function Footer({ onOpenBooking, onOpenAuth }: FooterProps) {
                   fontWeight: 700,
                 }}
               >
-                Studio Location
+                Location &amp; Home Service
               </div>
-              <div style={{ fontSize: '1.2rem', fontWeight: 800 }}>
-                {STUDIO_INFO.location}
+              <div style={{ fontSize: '1.15rem', fontWeight: 800 }}>
+                {STUDIO_INFO.location} • Domicile Available
               </div>
             </div>
           </div>
@@ -155,7 +155,7 @@ export default function Footer({ onOpenBooking, onOpenAuth }: FooterProps) {
             <p style={{ fontSize: '0.88rem', color: '#cfc4ca' }}>
               Premium machine facials, Korean Glass Skin, therapeutic body
               massages, bridal &amp; event glam, and authentic skincare
-              products—right at {STUDIO_INFO.location}.
+              products—at {STUDIO_INFO.location} or at your domicile.
             </p>
           </div>
 
@@ -229,7 +229,7 @@ export default function Footer({ onOpenBooking, onOpenAuth }: FooterProps) {
                 marginBlockEnd: '0.85rem',
               }}
             >
-              Studio Info &amp; Payments
+              Location &amp; Payments
             </h4>
             <div
               style={{
@@ -241,7 +241,7 @@ export default function Footer({ onOpenBooking, onOpenAuth }: FooterProps) {
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <MapPin size={15} color="#d4af37" />
-                <span>{STUDIO_INFO.location}</span>
+                <span>{STUDIO_INFO.location} (Home / Domicile Available)</span>
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                 <Phone size={15} color="#d4af37" />

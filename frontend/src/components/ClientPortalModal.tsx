@@ -29,7 +29,7 @@ const PAYMENT_METHODS: PaymentMethod[] = [
   'Tigo Pesa',
   'Airtel Money',
   'HaloPesa',
-  'Cash at Studio',
+  'Cash',
 ];
 
 export default function ClientPortalModal({
@@ -534,7 +534,7 @@ export default function ClientPortalModal({
                   ))}
                 </div>
 
-                {paymentMethod !== 'Cash at Studio' && (
+                {paymentMethod !== 'Cash' && (
                   <input
                     type="text"
                     placeholder={`Send ${paymentMethod} to ${STUDIO_INFO.phone} & paste SMS ref (Optional)`}

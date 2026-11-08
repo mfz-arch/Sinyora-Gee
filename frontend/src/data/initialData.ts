@@ -382,7 +382,7 @@ export const INITIAL_USERS: UserAccount[] = [
     password: 'Allah',
     role: 'admin',
     title: 'Founder & Lead Aesthetician',
-    hostel: 'Royal Hostel Studio',
+    hostel: 'Royal Hostel',
     createdAt: '2026-10-31T10:00:00.000Z',
   },
   {

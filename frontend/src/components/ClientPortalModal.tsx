@@ -10,6 +10,7 @@ import {
   CheckCircle2,
   ShieldCheck,
   User,
+  MessageCircle,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { STUDIO_INFO } from '@/data/initialData';
@@ -58,6 +59,7 @@ export default function ClientPortalModal({
     useState<PaymentMethod>('M-Pesa');
   const [transactionRef, setTransactionRef] = useState('');
   const [orderSuccessId, setOrderSuccessId] = useState<string | null>(null);
+  const [orderWhatsappUrl, setOrderWhatsappUrl] = useState<string>('');
 
   if (!isOpen) return null;
 
@@ -88,24 +90,60 @@ export default function ClientPortalModal({
     e.preventDefault();
     if (cart.length === 0) return;
 
+    const finalName =
+      clientName.trim() || currentUser?.name || 'Student Client';
+    const finalPhone = clientPhone.trim() || currentUser?.phone || '';
+    const finalLocation = deliveryLocation.trim() || 'Royal Hostel';
+    const itemsSnapshot = cart.map((c) => ({
+      productId: c.product.id,
+      name: c.product.name,
+      tag: c.product.tag,
+      price: c.product.price,
+      quantity: c.quantity,
+    }));
+
     const order = createProductOrder({
       clientId: currentUser?.id,
-      clientName: clientName.trim() || currentUser?.name || 'Student Client',
-      clientPhone: clientPhone.trim() || currentUser?.phone || '',
-      deliveryLocation: deliveryLocation.trim() || 'Royal Hostel',
-      items: cart.map((c) => ({
-        productId: c.product.id,
-        name: c.product.name,
-        tag: c.product.tag,
-        price: c.product.price,
-        quantity: c.quantity,
-      })),
+      clientName: finalName,
+      clientPhone: finalPhone,
+      deliveryLocation: finalLocation,
+      items: itemsSnapshot,
       totalPrice: cartTotal,
       paymentMethod,
       transactionRef: transactionRef.trim() || undefined,
     });
 
+    const itemsListText = itemsSnapshot
+      .map(
+        (i) =>
+          `• ${i.name} x${i.quantity} (${formatTsh(i.price * i.quantity)})`
+      )
+      .join('\n');
+
+    const waText = [
+      `✦ *NEW PRODUCT ORDER — SINYORA GEE* ✦`,
+      `*Order Ref:* ${order.id}`,
+      `*Client:* ${finalName}`,
+      `*Phone:* ${finalPhone}`,
+      `*Delivery / Pickup:* ${finalLocation}`,
+      ``,
+      `*Ordered Products:*`,
+      itemsListText,
+      ``,
+      `*Total:* ${formatTsh(cartTotal)}`,
+      `*Payment Method:* ${paymentMethod}`,
+      transactionRef.trim() ? `*Ref/SMS:* ${transactionRef.trim()}` : null,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
+    const waUrl = `https://wa.me/${STUDIO_INFO.whatsappInternational}?text=${encodeURIComponent(waText)}`;
+    setOrderWhatsappUrl(waUrl);
     setOrderSuccessId(order.id);
+
+    if (typeof window !== 'undefined') {
+      window.open(waUrl, '_blank', 'noopener,noreferrer');
+    }
   };
 
   return (
@@ -288,16 +326,36 @@ export default function ClientPortalModal({
                   Management at <strong>{STUDIO_INFO.location}</strong> has
                   received your skincare product order.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setOrderSuccessId(null);
-                    setTab('history');
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    justifyContent: 'center',
+                    gap: '0.65rem',
                   }}
-                  className="btn-primary"
                 >
-                  View Order Status
-                </button>
+                  {orderWhatsappUrl && (
+                    <a
+                      href={orderWhatsappUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn-gold"
+                    >
+                      <MessageCircle size={16} />
+                      <span>Resend Order on WhatsApp</span>
+                    </a>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrderSuccessId(null);
+                      setTab('history');
+                    }}
+                    className="btn-primary"
+                  >
+                    View Order Status
+                  </button>
+                </div>
               </div>
             ) : cart.length === 0 ? (
               <div style={{ textAlign: 'center', paddingBlock: '2rem' }}>

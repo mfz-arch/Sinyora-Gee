@@ -163,95 +163,7 @@ export default function ProductsSection({
           </p>
         </div>
 
-        {/* 5 Core Skincare Product Pillars from the Flyer */}
-        <div
-          style={{
-            display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(210px, 1fr))',
-            gap: '0.85rem',
-            marginBlockEnd: '1.5rem',
-          }}
-        >
-          {PRODUCT_CATEGORIES.map((cat) => {
-            const active = selectedCategory === cat.id;
-            const count = products.filter(
-              (p) => p.categoryId === cat.id
-            ).length;
-            return (
-              <button
-                key={cat.id}
-                type="button"
-                onClick={() =>
-                  setSelectedCategory(active ? 'all' : cat.id)
-                }
-                style={{
-                  textAlign: 'left',
-                  padding: '1rem 1.15rem',
-                  borderRadius: 'var(--radius-md)',
-                  background: active
-                    ? 'var(--brand-color)'
-                    : 'var(--bg-surface)',
-                  color: active ? '#ffffff' : 'var(--text-primary)',
-                  border: active
-                    ? '1.5px solid var(--brand-color)'
-                    : '1px solid var(--gold-border)',
-                  boxShadow: 'var(--shadow-sm)',
-                  transition: 'all 0.2s ease',
-                }}
-              >
-                <div
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'space-between',
-                    gap: '0.5rem',
-                    marginBlockEnd: '0.25rem',
-                  }}
-                >
-                  <span
-                    style={{
-                      display: 'inline-flex',
-                      alignItems: 'center',
-                      gap: '0.35rem',
-                      fontWeight: 700,
-                      fontSize: '0.92rem',
-                    }}
-                  >
-                    <CheckCircle2
-                      size={15}
-                      color={active ? '#f5e6b8' : 'var(--brand-color)'}
-                    />
-                    {cat.title}
-                  </span>
-                  <span
-                    style={{
-                      fontSize: '0.72rem',
-                      fontWeight: 700,
-                      padding: '0.12rem 0.5rem',
-                      borderRadius: '999px',
-                      background: active
-                        ? 'rgba(255,255,255,0.2)'
-                        : 'var(--brand-soft)',
-                      color: active ? '#fff' : 'var(--brand-color)',
-                    }}
-                  >
-                    {count}
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: '0.76rem',
-                    color: active ? '#f8e6ee' : 'var(--text-muted)',
-                  }}
-                >
-                  {cat.subtitle}
-                </div>
-              </button>
-            );
-          })}
-        </div>
-
-        {/* Dedicated Product Type Sections: Oils, Masks, Shampoos, Serums, etc. */}
+        {/* Unified Single-Row Product Section Filter Bar */}
         <div
           style={{
             display: 'flex',
@@ -264,6 +176,7 @@ export default function ProductsSection({
             background: 'var(--bg-surface)',
             borderRadius: 'var(--radius-md)',
             border: '1px solid var(--gold-border)',
+            boxShadow: 'var(--shadow-sm)',
           }}
         >
           <div className="horizontal-pills">
@@ -277,21 +190,24 @@ export default function ProductsSection({
                 padding: '0.45rem 0.95rem',
                 borderRadius: '999px',
                 border:
-                  selectedTag === 'all'
+                  selectedTag === 'all' && selectedCategory === 'all'
                     ? '1px solid var(--brand-color)'
                     : '1px solid var(--gold-border)',
                 background:
-                  selectedTag === 'all'
+                  selectedTag === 'all' && selectedCategory === 'all'
                     ? 'var(--brand-color)'
                     : 'var(--bg-secondary)',
                 color:
-                  selectedTag === 'all' ? '#ffffff' : 'var(--text-primary)',
+                  selectedTag === 'all' && selectedCategory === 'all'
+                    ? '#ffffff'
+                    : 'var(--text-primary)',
                 fontWeight: 600,
                 fontSize: '0.82rem',
                 whiteSpace: 'nowrap',
               }}
             >
-              All Sections ({products.length})
+              All Products
+              {products.length > 0 ? ` (${products.length})` : ''}
             </button>
 
             {PRODUCT_TAGS.map((tag) => {
@@ -319,14 +235,15 @@ export default function ProductsSection({
                     whiteSpace: 'nowrap',
                   }}
                 >
-                  {tag} ({tagCount})
+                  {tag}
+                  {tagCount > 0 ? ` (${tagCount})` : ''}
                 </button>
               );
             })}
           </div>
 
-          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
-            {isAdmin && (
+          {isAdmin && (
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
               <button
                 type="button"
                 onClick={() => setShowQuickAdd((prev) => !prev)}
@@ -340,8 +257,8 @@ export default function ProductsSection({
                     : '+ Add Product (Picture & Price)'}
                 </span>
               </button>
-            )}
-          </div>
+            </div>
+          )}
         </div>
 
         {/* Inline Admin Quick-Upload Form with Live Product Picture Preview */}
@@ -691,12 +608,12 @@ export default function ProductsSection({
                 marginBlockEnd: '1.5rem',
               }}
             >
-              Our dedicated sections for <strong>Oils</strong>,{' '}
+              Our curated shelves for <strong>Oils</strong>,{' '}
               <strong>Masks</strong>, <strong>Shampoos</strong>,{' '}
               <strong>Serums</strong>, <strong>Body Care</strong>, and{' '}
-              <strong>Organic Skincare</strong> are set up and ready. Management
-              can upload products with <strong>pictures, names, and prices</strong>{' '}
-              directly right here or in the Admin Portal.
+              <strong>Organic Skincare</strong> are ready at{' '}
+              <strong>Royal Hostel</strong>. Message us on WhatsApp to ask about
+              today&apos;s available stock!
             </p>
 
             <div
@@ -719,7 +636,7 @@ export default function ProductsSection({
                 <span>Ask Available Stock on WhatsApp</span>
               </a>
 
-              {isAdmin ? (
+              {isAdmin && (
                 <button
                   type="button"
                   onClick={() => setShowQuickAdd(true)}
@@ -727,15 +644,6 @@ export default function ProductsSection({
                 >
                   <Camera size={17} />
                   <span>Upload Product (Picture + Name + Price)</span>
-                </button>
-              ) : (
-                <button
-                  type="button"
-                  onClick={onOpenAuth}
-                  className="btn-outline"
-                >
-                  <ShieldCheck size={17} />
-                  <span>Management Login to Add Products</span>
                 </button>
               )}
             </div>

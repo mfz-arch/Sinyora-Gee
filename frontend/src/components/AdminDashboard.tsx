@@ -1217,31 +1217,143 @@ export default function AdminDashboard({
                             .join(', ')}{' '}
                           — {formatTsh(o.totalPrice)}
                         </div>
-                        <div style={{ display: 'flex', gap: '0.5rem' }}>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateOrderStatus(o.id, 'Processing')
-                            }
+                        <div
+                          style={{
+                            display: 'flex',
+                            flexWrap: 'wrap',
+                            alignItems: 'center',
+                            gap: '0.5rem',
+                          }}
+                        >
+                          {/* 1. Confirm Order (Only shown while Pending; turns into 'Order Confirmed • Preparing Delivery' badge once confirmed) */}
+                          {o.status === 'Pending' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateOrderStatus(o.id, 'Processing')
+                              }
+                              className="btn-primary"
+                              style={{
+                                padding: '0.38rem 0.85rem',
+                                fontSize: '0.78rem',
+                              }}
+                            >
+                              <CheckCircle2 size={14} /> Confirm Order
+                            </button>
+                          )}
+
+                          {o.status === 'Processing' && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.38rem 0.85rem',
+                                borderRadius: '999px',
+                                background: 'rgba(184, 29, 91, 0.1)',
+                                border: '1px solid rgba(184, 29, 91, 0.3)',
+                                color: 'var(--brand-color)',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              <CheckCircle2 size={14} /> Order Confirmed •
+                              Preparing Delivery
+                            </span>
+                          )}
+
+                          {/* 2. Mark Order Delivered (Shown when Processing, or turns into 'Product Order Delivered' badge) */}
+                          {o.status === 'Processing' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateOrderStatus(o.id, 'Delivered')
+                              }
+                              className="btn-gold"
+                              style={{
+                                padding: '0.38rem 0.9rem',
+                                fontSize: '0.78rem',
+                              }}
+                            >
+                              <CheckCircle2 size={14} /> Mark Order Delivered
+                            </button>
+                          )}
+
+                          {o.status === 'Delivered' && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.38rem 0.9rem',
+                                borderRadius: '999px',
+                                background: 'rgba(21, 128, 61, 0.12)',
+                                border: '1px solid rgba(21, 128, 61, 0.35)',
+                                color: 'var(--success)',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              <CheckCircle2 size={14} /> Product Order Delivered
+                              &amp; Completed
+                            </span>
+                          )}
+
+                          {/* 3. Cancel Button (Only visible while Pending; disappears after Confirming or Completing) */}
+                          {o.status === 'Pending' && (
+                            <button
+                              type="button"
+                              onClick={() =>
+                                updateOrderStatus(o.id, 'Cancelled')
+                              }
+                              className="btn-outline"
+                              style={{
+                                padding: '0.38rem 0.85rem',
+                                fontSize: '0.78rem',
+                              }}
+                            >
+                              <XCircle size={14} /> Cancel
+                            </button>
+                          )}
+
+                          {o.status === 'Cancelled' && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.38rem 0.85rem',
+                                borderRadius: '999px',
+                                background: 'rgba(190, 18, 60, 0.1)',
+                                border: '1px solid rgba(190, 18, 60, 0.3)',
+                                color: 'var(--danger)',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              <XCircle size={14} /> Order Cancelled
+                            </span>
+                          )}
+
+                          <a
+                            href={`https://wa.me/255${o.clientPhone
+                              .replace(/\D/g, '')
+                              .replace(/^0/, '')}?text=${encodeURIComponent(
+                              `Habari ${o.clientName}, your SINYORA GEE skincare order (${o.id}) for ${o.items
+                                .map((i) => `${i.name} x${i.quantity}`)
+                                .join(', ')} is ${o.status.toLowerCase()}!`
+                            )}`}
+                            target="_blank"
+                            rel="noopener noreferrer"
                             className="btn-outline"
                             style={{
-                              padding: '0.35rem 0.8rem',
+                              padding: '0.38rem 0.85rem',
                               fontSize: '0.78rem',
+                              textDecoration: 'none',
                             }}
                           >
-                            Mark Processing
-                          </button>
-                          <button
-                            type="button"
-                            onClick={() => updateOrderStatus(o.id, 'Delivered')}
-                            className="btn-primary"
-                            style={{
-                              padding: '0.35rem 0.8rem',
-                              fontSize: '0.78rem',
-                            }}
-                          >
-                            Mark Delivered
-                          </button>
+                            <MessageCircle size={14} /> WhatsApp Client
+                          </a>
                         </div>
                       </div>
                     ))}

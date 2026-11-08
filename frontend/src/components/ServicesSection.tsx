@@ -8,11 +8,13 @@ import {
   Flower2,
   Brush,
   Heart,
+  Droplets,
+  Check,
   X,
   ChevronRight,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
-import { SERVICE_CATEGORIES } from '@/data/initialData';
+import { PRODUCT_CATEGORIES, SERVICE_CATEGORIES } from '@/data/initialData';
 import { ServiceCategory, ServiceCategoryId, SpaService } from '@/types';
 import { formatTsh } from '@/utils/format';
 
@@ -382,6 +384,122 @@ export default function ServicesSection({
               </article>
             );
           })}
+
+          {/* 6th Card from the Original Price Flyer: SKIN CARE PRODUCTS (completes the 2x3 grid) */}
+          <article
+            className="flyer-section-card"
+            role="button"
+            tabIndex={0}
+            aria-label="Browse Skin Care Products in Cosmetics Shop"
+            onClick={() => {
+              const el = document.getElementById('products');
+              if (el) el.scrollIntoView({ behavior: 'smooth' });
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                const el = document.getElementById('products');
+                if (el) el.scrollIntoView({ behavior: 'smooth' });
+              }
+            }}
+          >
+            {/* Top Header Row: Exact Flyer Magenta Pill + Shop Link Hint */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.5rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div className="flyer-pill-header">
+                <span className="flyer-pill-icon">
+                  <Droplets size={15} color="#ffffff" />
+                </span>
+                <span>Skin Care Products</span>
+              </div>
+
+              <span
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.2rem',
+                  fontSize: '0.73rem',
+                  fontWeight: 700,
+                  color: '#b51053',
+                  background: 'rgba(216, 27, 104, 0.09)',
+                  border: '1px solid rgba(216, 27, 104, 0.25)',
+                  padding: '0.24rem 0.65rem',
+                  borderRadius: '999px',
+                }}
+              >
+                <span>Shop</span>
+                <ChevronRight size={13} />
+              </span>
+            </div>
+
+            {/* Side-by-Side Body matching the 6th Box on the Price Flyer */}
+            <div className="flyer-side-by-side-body">
+              <div
+                style={{
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'center',
+                }}
+              >
+                {PRODUCT_CATEGORIES.map((pCat) => (
+                  <div key={pCat.id} className="flyer-service-row">
+                    <span
+                      style={{
+                        display: 'inline-flex',
+                        alignItems: 'center',
+                        gap: '0.45rem',
+                        fontWeight: 600,
+                        color: '#23141b',
+                      }}
+                    >
+                      <Check
+                        size={14}
+                        strokeWidth={3}
+                        color="#c2185b"
+                        style={{ flexShrink: 0 }}
+                      />
+                      <span>{pCat.title}</span>
+                    </span>
+                  </div>
+                ))}
+              </div>
+
+              {/* Right: Exact Skincare Bottles Picture from the Flyer */}
+              <div
+                style={{
+                  borderRadius: '16px',
+                  overflow: 'clip',
+                  border: '1.5px solid rgba(212, 175, 55, 0.55)',
+                  boxShadow: '0 6px 16px rgba(32, 16, 24, 0.12)',
+                  background: '#fdf8f3',
+                  alignSelf: 'stretch',
+                  display: 'flex',
+                }}
+              >
+                <img
+                  src="/flyer/skincare-section.jpg"
+                  alt="Skin Care Products at Sinyora Gee"
+                  style={{
+                    inlineSize: '100%',
+                    blockSize: '100%',
+                    objectFit: 'cover',
+                  }}
+                />
+              </div>
+            </div>
+
+            {/* Bottom Cursive Script Tagline from the Flyer */}
+            <div className="flyer-script-tagline">
+              Healthy Skin • Radiant You ♥
+            </div>
+          </article>
         </div>
       </div>
 

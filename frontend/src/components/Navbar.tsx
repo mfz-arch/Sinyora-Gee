@@ -104,17 +104,18 @@ export default function Navbar({
         </div>
       </div>
 
-      {/* 2. Main Header blending smoothly into the skincare background */}
+      {/* 2. Main Header with crisp luxury espresso-glass finish */}
       <header
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 50,
           background:
-            'linear-gradient(180deg, rgba(18, 10, 14, 0.82) 0%, rgba(24, 13, 19, 0.52) 68%, rgba(24, 13, 19, 0.05) 100%)',
-          backdropFilter: 'blur(6px)',
-          WebkitBackdropFilter: 'blur(6px)',
-          borderBottom: 'none',
+            'linear-gradient(180deg, rgba(16, 8, 12, 0.96) 0%, rgba(22, 11, 17, 0.93) 100%)',
+          backdropFilter: 'blur(12px)',
+          WebkitBackdropFilter: 'blur(12px)',
+          borderBottom: '1px solid rgba(212, 175, 55, 0.32)',
+          boxShadow: '0 4px 20px rgba(12, 6, 9, 0.25)',
         }}
       >
         <div className="page-shell header-inner">

@@ -4,48 +4,118 @@ import React, { useState } from 'react';
 import {
   Sparkles,
   Calendar,
-  Search,
   Crown,
+  Flower2,
+  Brush,
+  Heart,
+  X,
+  ChevronRight,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { SERVICE_CATEGORIES } from '@/data/initialData';
-import { ServiceCategoryId, SpaService } from '@/types';
+import { ServiceCategory, ServiceCategoryId, SpaService } from '@/types';
 import { formatTsh } from '@/utils/format';
 
 interface ServicesSectionProps {
   onOpenBooking: () => void;
 }
 
+const FLYER_SECTION_META: Record<
+  ServiceCategoryId,
+  {
+    layout: 'side' | 'bottom';
+    photoSrc: string;
+    photoAlt: string;
+  }
+> = {
+  facial: {
+    layout: 'side',
+    photoSrc: '/flyer/facial-section.jpg',
+    photoAlt: 'Facial treatment at Sinyora Gee',
+  },
+  massage: {
+    layout: 'bottom',
+    photoSrc: '/flyer/massage-section.jpg',
+    photoAlt: 'Massage and aromatherapy at Sinyora Gee',
+  },
+  bridal: {
+    layout: 'side',
+    photoSrc: '/flyer/bridal-section.jpg',
+    photoAlt: 'Bridal and event package at Sinyora Gee',
+  },
+  makeup: {
+    layout: 'bottom',
+    photoSrc: '/flyer/makeup-section.jpg',
+    photoAlt: 'Makeup artistry at Sinyora Gee',
+  },
+  additional: {
+    layout: 'bottom',
+    photoSrc: '/flyer/additional-section.jpg',
+    photoAlt: 'Eyebrow shaping, eyelash extensions and hair care',
+  },
+};
+
+function CategoryIcon({ id }: { id: ServiceCategoryId }) {
+  switch (id) {
+    case 'facial':
+      return <Flower2 size={15} color="#ffffff" />;
+    case 'massage':
+      return <Sparkles size={15} color="#ffffff" />;
+    case 'bridal':
+      return <Crown size={15} color="#ffffff" />;
+    case 'makeup':
+      return <Brush size={15} color="#ffffff" />;
+    case 'additional':
+      return <Heart size={15} color="#ffffff" />;
+  }
+}
+
+function LotusBullet() {
+  return (
+    <span
+      aria-hidden="true"
+      style={{
+        display: 'inline-flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        color: '#d81b68',
+        fontSize: '0.82rem',
+        flexShrink: 0,
+        lineHeight: 1,
+      }}
+    >
+      ❀
+    </span>
+  );
+}
+
 export default function ServicesSection({
   onOpenBooking,
 }: ServicesSectionProps) {
-  const {
-    services,
-    clearBookingSelection,
-    toggleServiceForBooking,
-  } = useStore();
+  const { services, clearBookingSelection, toggleServiceForBooking } =
+    useStore();
 
-  const [activeCategory, setActiveCategory] = useState<
-    ServiceCategoryId | 'all'
-  >('all');
-  const [searchQuery, setSearchQuery] = useState('');
+  // Step 1 popup state: when user clicks a specific service section, its subservices pop up
+  const [activePopupCategory, setActivePopupCategory] =
+    useState<ServiceCategory | null>(null);
 
-  const handleBookDirect = (service: SpaService) => {
+  // Step 2: when user selects a subservice inside the popup, proceed immediately to BookingModal
+  const handleSelectSubserviceToBook = (subservice: SpaService) => {
     clearBookingSelection();
-    toggleServiceForBooking(service);
+    toggleServiceForBooking(subservice);
+    setActivePopupCategory(null);
     onOpenBooking();
   };
 
-  const categoriesToDisplay =
-    activeCategory === 'all'
-      ? SERVICE_CATEGORIES
-      : SERVICE_CATEGORIES.filter((c) => c.id === activeCategory);
+  const popupSubservices = activePopupCategory
+    ? services.filter((s) => s.categoryId === activePopupCategory.id)
+    : [];
 
   return (
     <section
       id="services"
       style={{
-        paddingBlock: 'clamp(2.5rem, 6vw, 5rem)',
+        paddingBlock: 'clamp(2.25rem, 5vw, 4rem)',
         background: 'var(--bg-primary)',
       }}
     >
@@ -57,388 +127,426 @@ export default function ServicesSection({
             textAlign: 'center',
             maxInlineSize: '760px',
             marginInline: 'auto',
-            marginBlockEnd: '2rem',
+            marginBlockEnd: '1.5rem',
           }}
         >
           <span
             className="rose-pill-badge"
-            style={{ marginBlockEnd: '0.65rem' }}
+            style={{ marginBlockEnd: '0.55rem' }}
           >
-            <Sparkles size={13} /> Official Studio Menu &amp; Rates
+            <Sparkles size={13} /> Interactive Studio Price Flyer
           </span>
           <h2
             className="section-fluid-title"
             style={{
               color: 'var(--text-primary)',
-              marginBlockEnd: '0.65rem',
+              marginBlockEnd: '0.5rem',
             }}
           >
             Luxury Treatments &amp; Service Menu
           </h2>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '0.98rem' }}>
-            Select one or more treatments below to book your private session at{' '}
-            <strong>Royal Hostel</strong>. All prices are transparent and
-            tailored for university students and brides-to-be.
+          <p style={{ color: 'var(--text-secondary)', fontSize: '0.95rem' }}>
+            Tap any service section below to view its treatments and book your
+            session at <strong>Royal Hostel</strong>.
           </p>
         </div>
 
-        {/* Sticky Filter & Search Toolbar */}
+        {/* Quick Section Selector Pills */}
         <div
+          className="horizontal-pills"
           style={{
-            display: 'flex',
-            flexWrap: 'wrap',
-            alignItems: 'safe center',
-            justifyContent: 'space-between',
-            gap: '1rem',
-            marginBlockEnd: '2.5rem',
-            padding: '0.85rem 1rem',
-            background: 'var(--bg-surface)',
-            borderRadius: 'var(--radius-md)',
-            border: '1px solid var(--gold-border)',
-            boxShadow: 'var(--shadow-sm)',
+            justifyContent: 'center',
+            marginBlockEnd: '1.5rem',
           }}
         >
-          {/* Category Filter Pills (Scrollable on Phone, Wrapped on PC) */}
-          <div className="horizontal-pills" style={{ flex: '1 1 auto' }}>
-            <button
-              type="button"
-              onClick={() => setActiveCategory('all')}
-              style={{
-                padding: '0.5rem 1.05rem',
-                borderRadius: '999px',
-                border:
-                  activeCategory === 'all'
-                    ? '1px solid var(--brand-color)'
-                    : '1px solid var(--gold-border)',
-                background:
-                  activeCategory === 'all'
-                    ? 'var(--brand-color)'
-                    : 'var(--bg-secondary)',
-                color:
-                  activeCategory === 'all' ? '#ffffff' : 'var(--text-primary)',
-                fontWeight: 600,
-                fontSize: '0.84rem',
-                whiteSpace: 'nowrap',
-              }}
-            >
-              All Services ({services.length})
-            </button>
-
-            {SERVICE_CATEGORIES.map((cat) => {
-              const count = services.filter(
-                (s) => s.categoryId === cat.id
-              ).length;
-              const isSelected = activeCategory === cat.id;
-              return (
-                <button
-                  key={cat.id}
-                  type="button"
-                  onClick={() => setActiveCategory(cat.id)}
-                  style={{
-                    padding: '0.5rem 1.05rem',
-                    borderRadius: '999px',
-                    border: isSelected
-                      ? '1px solid var(--brand-color)'
-                      : '1px solid var(--gold-border)',
-                    background: isSelected
-                      ? 'var(--brand-color)'
-                      : 'var(--bg-secondary)',
-                    color: isSelected ? '#ffffff' : 'var(--text-primary)',
-                    fontWeight: 600,
-                    fontSize: '0.84rem',
-                    whiteSpace: 'nowrap',
-                  }}
-                >
-                  {cat.title} ({count})
-                </button>
-              );
-            })}
-          </div>
-
-          {/* Search Input */}
-          <div
-            style={{
-              position: 'relative',
-              flex: '1 1 230px',
-              maxInlineSize: '320px',
-            }}
-          >
-            <Search
-              size={16}
-              color="var(--text-muted)"
-              style={{
-                position: 'absolute',
-                left: '0.85rem',
-                top: '50%',
-                transform: 'translateY(-50%)',
-              }}
-            />
-            <input
-              type="search"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search facial, massage, glam..."
-              enterKeyHint="search"
-              className="form-input"
-              style={{
-                paddingInlineStart: '2.4rem',
-                paddingBlock: '0.55rem',
-                borderRadius: '999px',
-                fontSize: '0.86rem',
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Dedicated Category Sections */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '3.5rem' }}>
-          {categoriesToDisplay.map((category) => {
-            const categoryServices = services.filter((srv) => {
-              const matchesCat = srv.categoryId === category.id;
-              const matchesSearch =
-                !searchQuery.trim() ||
-                srv.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                srv.description
-                  .toLowerCase()
-                  .includes(searchQuery.toLowerCase());
-              return matchesCat && matchesSearch;
-            });
-
-            if (categoryServices.length === 0) return null;
-
+          {SERVICE_CATEGORIES.map((cat) => {
+            const count = services.filter(
+              (s) => s.categoryId === cat.id
+            ).length;
             return (
-              <div
-                key={category.id}
-                id={category.id === 'bridal' ? 'bridal' : `section-${category.id}`}
+              <button
+                key={cat.id}
+                type="button"
+                onClick={() => setActivePopupCategory(cat)}
                 style={{
-                  background: 'var(--bg-secondary)',
+                  padding: '0.48rem 1rem',
+                  borderRadius: '999px',
                   border: '1px solid var(--gold-border)',
-                  borderRadius: 'var(--radius-lg)',
-                  padding: 'clamp(1.25rem, 3vw, 2.25rem)',
+                  background: 'var(--bg-surface)',
+                  color: 'var(--text-primary)',
+                  fontWeight: 700,
+                  fontSize: '0.82rem',
+                  whiteSpace: 'nowrap',
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: '0.4rem',
+                  boxShadow: 'var(--shadow-sm)',
                 }}
               >
-                {/* Category Header Banner styled after the Flyer's luxury headers */}
+                <span style={{ color: '#d81b68' }}>❀</span>
+                <span>
+                  {cat.title} ({count})
+                </span>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Interactive Price Flyer Grid (5 Sections matching the exact Flyer boxes, photos & prices) */}
+        <div className="flyer-sections-grid">
+          {SERVICE_CATEGORIES.map((category) => {
+            const categoryServices = services.filter(
+              (srv) => srv.categoryId === category.id
+            );
+            const meta = FLYER_SECTION_META[category.id];
+            const sectionDomId =
+              category.id === 'bridal' ? 'bridal' : `section-${category.id}`;
+
+            return (
+              <article
+                key={category.id}
+                id={sectionDomId}
+                className="flyer-section-card"
+                role="button"
+                tabIndex={0}
+                aria-label={`Open ${category.title} subservices`}
+                onClick={() => setActivePopupCategory(category)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    setActivePopupCategory(category);
+                  }
+                }}
+              >
+                {/* Top Header Row: Exact Flyer Magenta Pill + Interactive Tap Hint */}
                 <div
                   style={{
                     display: 'flex',
-                    flexWrap: 'wrap',
-                    alignItems: 'safe center',
+                    alignItems: 'center',
                     justifyContent: 'space-between',
-                    gap: '1rem',
-                    marginBlockEnd: '1.6rem',
-                    paddingBottom: '1.1rem',
-                    borderBottom: '1px solid var(--gold-border)',
+                    gap: '0.5rem',
+                    flexWrap: 'wrap',
                   }}
                 >
-                  <div>
+                  <div className="flyer-pill-header">
+                    <span className="flyer-pill-icon">
+                      <CategoryIcon id={category.id} />
+                    </span>
+                    <span>{category.title}</span>
+                  </div>
+
+                  <span
+                    style={{
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.2rem',
+                      fontSize: '0.73rem',
+                      fontWeight: 700,
+                      color: '#b51053',
+                      background: 'rgba(216, 27, 104, 0.09)',
+                      border: '1px solid rgba(216, 27, 104, 0.25)',
+                      padding: '0.24rem 0.65rem',
+                      borderRadius: '999px',
+                    }}
+                  >
+                    <span>Select</span>
+                    <ChevronRight size={13} />
+                  </span>
+                </div>
+
+                {/* Section Body: Side-by-Side (Facial & Bridal) or Top-List + Bottom-Photos (Massage, Makeup, Additional) */}
+                {meta.layout === 'side' ? (
+                  <div className="flyer-side-by-side-body">
+                    {/* Left: Exact Service Names & Exact Prices */}
                     <div
                       style={{
-                        display: 'inline-flex',
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {categoryServices.map((srv) => (
+                        <div key={srv.id} className="flyer-service-row">
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.4rem',
+                              fontWeight: 600,
+                              color: '#23141b',
+                            }}
+                          >
+                            <LotusBullet />
+                            <span>{srv.name}</span>
+                          </span>
+                          <strong
+                            style={{
+                              color: '#c2185b',
+                              fontWeight: 800,
+                              whiteSpace: 'nowrap',
+                              fontSize: '0.86rem',
+                            }}
+                          >
+                            {formatTsh(srv.price)}
+                          </strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Right: Exact Picture from the Flyer */}
+                    <div
+                      style={{
+                        borderRadius: '16px',
+                        overflow: 'clip',
+                        border: '1.5px solid rgba(212, 175, 55, 0.55)',
+                        boxShadow: '0 6px 16px rgba(32, 16, 24, 0.12)',
+                        background: '#f6ebe2',
+                        alignSelf: 'stretch',
+                        display: 'flex',
+                      }}
+                    >
+                      <img
+                        src={meta.photoSrc}
+                        alt={meta.photoAlt}
+                        style={{
+                          inlineSize: '100%',
+                          blockSize: '100%',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    </div>
+                  </div>
+                ) : (
+                  <div
+                    style={{
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: '0.65rem',
+                      marginBlock: '0.65rem 0.35rem',
+                    }}
+                  >
+                    {/* Top: Exact Service Names & Exact Prices */}
+                    <div style={{ display: 'flex', flexDirection: 'column' }}>
+                      {categoryServices.map((srv) => (
+                        <div key={srv.id} className="flyer-service-row">
+                          <span
+                            style={{
+                              display: 'inline-flex',
+                              alignItems: 'center',
+                              gap: '0.45rem',
+                              fontWeight: 600,
+                              color: '#23141b',
+                            }}
+                          >
+                            <LotusBullet />
+                            <span>{srv.name}</span>
+                          </span>
+                          <strong
+                            style={{
+                              color: '#c2185b',
+                              fontWeight: 800,
+                              whiteSpace: 'nowrap',
+                              fontSize: '0.88rem',
+                            }}
+                          >
+                            {formatTsh(srv.price)}
+                          </strong>
+                        </div>
+                      ))}
+                    </div>
+
+                    {/* Bottom: Exact 3-Photo Strip from the Flyer */}
+                    <div
+                      style={{
+                        borderRadius: '12px',
+                        overflow: 'clip',
+                        border: '1.5px solid rgba(212, 175, 55, 0.5)',
+                        background: '#f6ebe2',
+                      }}
+                    >
+                      <img
+                        src={meta.photoSrc}
+                        alt={meta.photoAlt}
+                        style={{
+                          inlineSize: '100%',
+                          blockSize: 'auto',
+                          display: 'block',
+                          objectFit: 'cover',
+                        }}
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Bottom Cursive Script Tagline from the Flyer */}
+                <div className="flyer-script-tagline">{category.tagline}</div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* =====================================================================
+          STEP 1 POPUP MODAL: Subservices Popup when a Service Section is clicked
+          ===================================================================== */}
+      {activePopupCategory && (
+        <div
+          className="modal-backdrop"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="subservices-popup-title"
+          onClick={() => setActivePopupCategory(null)}
+        >
+          <div
+            className="modal-sheet"
+            style={{
+              maxInlineSize: '560px',
+              background: 'linear-gradient(180deg, #fffdfa 0%, #f9efe7 100%)',
+              border: '2px solid #d4af37',
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Popup Header */}
+            <div
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                padding: '1rem 1.25rem',
+                borderBottom: '1px solid rgba(212, 175, 55, 0.45)',
+                background: 'rgba(255, 250, 245, 0.9)',
+              }}
+            >
+              <div>
+                <div className="flyer-pill-header" style={{ fontSize: '0.82rem' }}>
+                  <span className="flyer-pill-icon">
+                    <CategoryIcon id={activePopupCategory.id} />
+                  </span>
+                  <span id="subservices-popup-title">
+                    {activePopupCategory.title}
+                  </span>
+                </div>
+                <p
+                  style={{
+                    fontSize: '0.8rem',
+                    color: 'var(--text-secondary)',
+                    marginTop: '0.35rem',
+                    fontWeight: 600,
+                  }}
+                >
+                  Select the specific treatment you want to book:
+                </p>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setActivePopupCategory(null)}
+                className="btn-outline"
+                style={{ padding: '0.4rem 0.6rem' }}
+                aria-label="Close subservices popup"
+              >
+                <X size={18} />
+              </button>
+            </div>
+
+            {/* Popup Body: Interactive List of Subservices */}
+            <div
+              className="scrollable-drawer-body"
+              style={{
+                padding: '1rem 1.25rem 1.35rem',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '0.65rem',
+              }}
+            >
+              {popupSubservices.map((sub) => (
+                <button
+                  key={sub.id}
+                  type="button"
+                  onClick={() => handleSelectSubserviceToBook(sub)}
+                  style={{
+                    inlineSize: '100%',
+                    textAlign: 'left',
+                    padding: '0.85rem 1rem',
+                    borderRadius: '14px',
+                    background: '#ffffff',
+                    border: '1.5px solid rgba(212, 175, 55, 0.55)',
+                    boxShadow: '0 4px 12px rgba(32, 16, 24, 0.05)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    gap: '0.85rem',
+                    cursor: 'pointer',
+                    transition: 'all 0.18s ease',
+                  }}
+                >
+                  <div style={{ flex: 1 }}>
+                    <div
+                      style={{
+                        display: 'flex',
                         alignItems: 'center',
                         gap: '0.45rem',
-                        background:
-                          'linear-gradient(90deg, var(--brand-color) 0%, var(--brand-hover) 100%)',
-                        color: '#ffffff',
-                        padding: '0.35rem 1rem',
-                        borderRadius: '999px',
-                        fontSize: '0.75rem',
-                        fontWeight: 700,
-                        letterSpacing: '0.08em',
-                        textTransform: 'uppercase',
-                        marginBlockEnd: '0.5rem',
+                        fontWeight: 800,
+                        fontSize: '0.98rem',
+                        color: '#23141b',
+                        marginBlockEnd: '0.2rem',
                       }}
                     >
-                      <Crown size={13} /> {category.badge}
+                      <LotusBullet />
+                      <span>{sub.name}</span>
                     </div>
-                    <h3
-                      style={{
-                        fontSize: 'clamp(1.4rem, 2.6vw, 2rem)',
-                        color: 'var(--text-primary)',
-                      }}
-                    >
-                      {category.title}
-                    </h3>
                     <p
                       style={{
-                        fontSize: '0.9rem',
+                        fontSize: '0.8rem',
                         color: 'var(--text-secondary)',
-                        marginTop: '0.2rem',
+                        lineHeight: 1.4,
                       }}
                     >
-                      {category.description}
+                      {sub.description}
                     </p>
                   </div>
 
                   <div
                     style={{
-                      fontFamily: 'Playfair Display, Georgia, serif',
-                      fontStyle: 'italic',
-                      fontWeight: 700,
-                      color: 'var(--brand-color)',
-                      fontSize: '0.98rem',
-                      background: 'var(--bg-surface)',
-                      padding: '0.45rem 1rem',
-                      borderRadius: '999px',
-                      border: '1px solid var(--brand-border)',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'flex-end',
+                      gap: '0.35rem',
+                      flexShrink: 0,
                     }}
                   >
-                    {category.tagline}
+                    <span
+                      style={{
+                        fontWeight: 800,
+                        fontSize: '0.96rem',
+                        color: sub.price === 0 ? 'var(--success)' : '#c2185b',
+                      }}
+                    >
+                      {formatTsh(sub.price)}
+                    </span>
+
+                    <span
+                      className="btn-primary"
+                      style={{
+                        padding: '0.35rem 0.8rem',
+                        fontSize: '0.76rem',
+                        pointerEvents: 'none',
+                      }}
+                    >
+                      <Calendar size={13} />
+                      <span>Book</span>
+                    </span>
                   </div>
-                </div>
+                </button>
+              ))}
 
-                {/* CSS Subgrid Service Cards */}
-                <div className="cards-subgrid-container">
-                  {categoryServices.map((srv) => (
-                    <article key={srv.id} className="subgrid-card">
-                      {/* Row 1: Image & Top Badges */}
-                        <div
-                          style={{
-                            position: 'relative',
-                            aspectRatio: '16 / 10',
-                            background: '#221a20',
-                            overflow: 'clip',
-                          }}
-                        >
-                          <img
-                            src={srv.image}
-                            alt={srv.name}
-                            loading="lazy"
-                            style={{
-                              inlineSize: '100%',
-                              blockSize: '100%',
-                              objectFit: 'cover',
-                            }}
-                          />
-                          <div
-                            style={{
-                              position: 'absolute',
-                              top: '0.75rem',
-                              left: '0.75rem',
-                              right: '0.75rem',
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'center',
-                              gap: '0.4rem',
-                            }}
-                          >
-                            {srv.badge && (
-                              <span
-                                style={{
-                                  background:
-                                    srv.price === 0
-                                      ? '#15803d'
-                                      : 'rgba(20, 17, 21, 0.84)',
-                                  color: '#fff',
-                                  fontSize: '0.7rem',
-                                  fontWeight: 700,
-                                  padding: '0.25rem 0.65rem',
-                                  borderRadius: '999px',
-                                  backdropFilter: 'blur(6px)',
-                                }}
-                              >
-                                {srv.badge}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-
-                        {/* Row 2: Title & Description */}
-                        <div style={{ padding: '1.15rem 1.25rem 0.5rem' }}>
-                          <div
-                            style={{
-                              display: 'flex',
-                              justifyContent: 'space-between',
-                              alignItems: 'flex-start',
-                              gap: '0.5rem',
-                              marginBlockEnd: '0.45rem',
-                            }}
-                          >
-                            <h4
-                              style={{
-                                fontSize: '1.18rem',
-                                color: 'var(--text-primary)',
-                              }}
-                            >
-                              {srv.name}
-                            </h4>
-                          </div>
-                          <p
-                            style={{
-                              fontSize: '0.86rem',
-                              color: 'var(--text-secondary)',
-                            }}
-                          >
-                            {srv.description}
-                          </p>
-                        </div>
-
-                        {/* Row 3: Price & Action Buttons */}
-                        <div
-                          style={{
-                            padding: '0.9rem 1.25rem 1.2rem',
-                            display: 'flex',
-                            alignItems: 'safe center',
-                            justifyContent: 'space-between',
-                            gap: '0.75rem',
-                            borderTop: '1px solid rgba(230, 204, 128, 0.45)',
-                            marginTop: '0.5rem',
-                          }}
-                        >
-                          <div>
-                            <div
-                              style={{
-                                fontSize: '0.68rem',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.08em',
-                                color: 'var(--text-muted)',
-                                fontWeight: 600,
-                              }}
-                            >
-                              Service Price
-                            </div>
-                            <div
-                              style={{
-                                fontSize: '1.18rem',
-                                fontWeight: 800,
-                                color:
-                                  srv.price === 0
-                                    ? 'var(--success)'
-                                    : 'var(--brand-color)',
-                              }}
-                            >
-                              {formatTsh(srv.price)}
-                            </div>
-                          </div>
-
-                          <div
-                            style={{
-                              display: 'flex',
-                              alignItems: 'center',
-                              gap: '0.45rem',
-                            }}
-                          >
-                            <button
-                              type="button"
-                              onClick={() => handleBookDirect(srv)}
-                              className="btn-primary"
-                              style={{
-                                padding: '0.55rem 1.15rem',
-                                fontSize: '0.82rem',
-                              }}
-                            >
-                              <Calendar size={14} /> Book Treatment
-                            </button>
-                          </div>
-                        </div>
-                      </article>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
+              <div className="flyer-script-tagline" style={{ marginTop: '0.4rem' }}>
+                {activePopupCategory.tagline}
+              </div>
+            </div>
           </div>
         </div>
-      </section>
-    );
-  }
-
+      )}
+    </section>
+  );
+}

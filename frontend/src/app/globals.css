@@ -845,3 +845,116 @@ button {
   border-color: var(--brand-color);
   box-shadow: 0 0 0 3px var(--brand-soft);
 }
+
+/* ==========================================================================
+   INTERACTIVE PRICE FLYER GRID & SECTION CARDS (Phone & PC)
+   ========================================================================== */
+.flyer-sections-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.25rem;
+}
+
+@media (min-width: 820px) {
+  .flyer-sections-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.5rem;
+  }
+}
+
+.flyer-section-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: linear-gradient(180deg, #fffdfa 0%, #f9efe7 100%);
+  border: 1.8px solid #d4af37;
+  border-radius: 20px;
+  padding: 1rem 1.15rem 0.9rem;
+  box-shadow:
+    0 8px 24px rgba(32, 16, 24, 0.08),
+    inset 0 0 0 1px rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  text-align: left;
+  overflow: clip;
+}
+
+.flyer-section-card:hover {
+  transform: translateY(-3px);
+  border-color: #b81d5b;
+  box-shadow:
+    0 14px 32px rgba(184, 29, 91, 0.16),
+    0 0 0 1.5px rgba(184, 29, 91, 0.25);
+}
+
+.flyer-pill-header {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  background: linear-gradient(90deg, #900a42 0%, #d81b68 55%, #b51053 100%);
+  color: #ffffff;
+  padding: 0.36rem 1.1rem 0.36rem 0.45rem;
+  border-radius: 999px;
+  font-weight: 800;
+  font-size: clamp(0.8rem, 1.35vw, 0.96rem);
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  box-shadow: 0 4px 12px rgba(184, 29, 91, 0.28);
+}
+
+.flyer-pill-icon {
+  inline-size: 28px;
+  block-size: 28px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.18);
+  border: 1.5px solid rgba(255, 255, 255, 0.85);
+  display: grid;
+  place-content: center;
+  flex-shrink: 0;
+}
+
+.flyer-side-by-side-body {
+  display: grid;
+  grid-template-columns: 1fr clamp(108px, 34%, 168px);
+  gap: 0.75rem;
+  align-items: center;
+  margin-block: 0.65rem 0.45rem;
+}
+
+@media (max-width: 390px) {
+  .flyer-side-by-side-body {
+    grid-template-columns: 1fr 100px;
+    gap: 0.5rem;
+  }
+}
+
+.flyer-service-row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.45rem;
+  padding-block: 0.26rem;
+  border-bottom: 1px dashed rgba(212, 175, 55, 0.38);
+  font-size: clamp(0.8rem, 1.15vw, 0.92rem);
+}
+
+.flyer-service-row:last-child {
+  border-bottom: none;
+}
+
+.flyer-script-tagline {
+  text-align: center;
+  font-family: 'Playfair Display', Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  color: #c2185b;
+  font-size: clamp(0.86rem, 1.25vw, 1.02rem);
+  padding-top: 0.4rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(212, 175, 55, 0.3);
+}
+

@@ -74,7 +74,7 @@ const StoreContext = createContext<StoreContextType | undefined>(undefined);
 
 const STORAGE_KEYS = {
   THEME: 'sinyora_gee_theme_v1',
-  SERVICES: 'sinyora_gee_services_v1',
+  SERVICES: 'sinyora_gee_services_v2',
   PRODUCTS: 'sinyora_gee_products_v1',
   BOOKINGS: 'sinyora_gee_bookings_v1',
   ORDERS: 'sinyora_gee_orders_v1',

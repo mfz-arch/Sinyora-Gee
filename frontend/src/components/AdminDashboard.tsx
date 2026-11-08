@@ -237,7 +237,10 @@ export default function AdminDashboard({
               {bookings.length}
             </div>
             <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
-              Est. {formatTsh(totalBookingRevenue)}
+              Est.{' '}
+              {totalBookingRevenue === 0
+                ? 'Tsh 0'
+                : formatTsh(totalBookingRevenue)}
             </div>
           </div>
 
@@ -287,7 +290,8 @@ export default function AdminDashboard({
               {orders.length}
             </div>
             <div style={{ fontSize: '0.76rem', color: 'var(--text-secondary)' }}>
-              Sales: {formatTsh(totalOrderRevenue)}
+              Sales:{' '}
+              {totalOrderRevenue === 0 ? 'Tsh 0' : formatTsh(totalOrderRevenue)}
             </div>
           </div>
 
@@ -509,50 +513,116 @@ export default function AdminDashboard({
                           style={{
                             display: 'flex',
                             flexWrap: 'wrap',
+                            alignItems: 'center',
                             gap: '0.5rem',
                           }}
                         >
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateBookingStatus(b.id, 'Confirmed')
-                            }
-                            className="btn-primary"
-                            style={{
-                              padding: '0.4rem 0.85rem',
-                              fontSize: '0.78rem',
-                            }}
-                          >
-                            <CheckCircle2 size={14} /> Confirm Slot
-                          </button>
+                          {b.status === 'Pending' && (
+                            <>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateBookingStatus(b.id, 'Confirmed')
+                                }
+                                className="btn-primary"
+                                style={{
+                                  padding: '0.4rem 0.85rem',
+                                  fontSize: '0.78rem',
+                                }}
+                              >
+                                <CheckCircle2 size={14} /> Confirm Slot
+                              </button>
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateBookingStatus(b.id, 'Completed')
-                            }
-                            className="btn-gold"
-                            style={{
-                              padding: '0.4rem 0.85rem',
-                              fontSize: '0.78rem',
-                            }}
-                          >
-                            Mark Completed
-                          </button>
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateBookingStatus(b.id, 'Cancelled')
+                                }
+                                className="btn-outline"
+                                style={{
+                                  padding: '0.4rem 0.85rem',
+                                  fontSize: '0.78rem',
+                                }}
+                              >
+                                <XCircle size={14} /> Cancel
+                              </button>
+                            </>
+                          )}
 
-                          <button
-                            type="button"
-                            onClick={() =>
-                              updateBookingStatus(b.id, 'Cancelled')
-                            }
-                            className="btn-outline"
-                            style={{
-                              padding: '0.4rem 0.85rem',
-                              fontSize: '0.78rem',
-                            }}
-                          >
-                            <XCircle size={14} /> Cancel
-                          </button>
+                          {b.status === 'Confirmed' && (
+                            <>
+                              <span
+                                style={{
+                                  display: 'inline-flex',
+                                  alignItems: 'center',
+                                  gap: '0.35rem',
+                                  padding: '0.4rem 0.9rem',
+                                  borderRadius: '999px',
+                                  background: 'var(--success-bg)',
+                                  color: 'var(--success)',
+                                  border: '1px solid rgba(21, 128, 61, 0.3)',
+                                  fontSize: '0.78rem',
+                                  fontWeight: 700,
+                                }}
+                              >
+                                <CheckCircle2 size={14} /> Slot Confirmed •
+                                Awaiting Session
+                              </span>
+
+                              <button
+                                type="button"
+                                onClick={() =>
+                                  updateBookingStatus(b.id, 'Completed')
+                                }
+                                className="btn-gold"
+                                style={{
+                                  padding: '0.4rem 0.9rem',
+                                  fontSize: '0.78rem',
+                                }}
+                              >
+                                <Sparkles size={14} /> Mark Service Completed
+                              </button>
+                            </>
+                          )}
+
+                          {b.status === 'Completed' && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.4rem 0.9rem',
+                                borderRadius: '999px',
+                                background: 'var(--success-bg)',
+                                color: 'var(--success)',
+                                border: '1px solid rgba(21, 128, 61, 0.35)',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              <CheckCircle2 size={14} /> Treatment Accomplished
+                              &amp; Completed
+                            </span>
+                          )}
+
+                          {b.status === 'Cancelled' && (
+                            <span
+                              style={{
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '0.35rem',
+                                padding: '0.4rem 0.9rem',
+                                borderRadius: '999px',
+                                background: 'var(--danger-bg)',
+                                color: 'var(--danger)',
+                                border: '1px solid rgba(190, 18, 60, 0.3)',
+                                fontSize: '0.78rem',
+                                fontWeight: 700,
+                              }}
+                            >
+                              <XCircle size={14} /> Appointment Cancelled
+                            </span>
+                          )}
 
                           <a
                             href={`https://wa.me/${b.clientPhone.replace(

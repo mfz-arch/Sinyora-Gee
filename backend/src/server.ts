@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { getActiveDbMode, initDatabase, loadState, saveState } from './db';
+import { isCloudinaryEnabled, uploadProductImageIfNeeded } from './cloudinary';
 import {
   BookingStatus,
   ColorThemeId,
@@ -39,6 +40,7 @@ app.get('/api/health', (_req, res) => {
     ok: true,
     service: 'SINYORA GEE Shared Backend API',
     databaseMode: getActiveDbMode(),
+    cloudinaryEnabled: isCloudinaryEnabled(),
     timestamp: new Date().toISOString(),
   });
 });
@@ -174,12 +176,17 @@ app.get('/api/products', async (_req, res) => {
 });
 
 app.post('/api/products', async (req, res) => {
-  const payload = req.body as Omit<SpaProduct, 'id' | 'createdAt'>;
+  const payload = req.body as Omit<SpaProduct, 'id' | 'createdAt'> & {
+    id?: string;
+    createdAt?: string;
+  };
   const state = await loadState();
+  const uploadedImageUrl = await uploadProductImageIfNeeded(payload.image);
   const created: SpaProduct = {
     ...payload,
-    id: `prd-${Date.now()}`,
-    createdAt: new Date().toISOString(),
+    image: uploadedImageUrl,
+    id: payload.id || `prd-${Date.now()}`,
+    createdAt: payload.createdAt || new Date().toISOString(),
   };
   state.products.unshift(created);
   await saveState(state);
@@ -188,13 +195,16 @@ app.post('/api/products', async (req, res) => {
 
 app.put('/api/products/:id', async (req, res) => {
   const { id } = req.params;
-  const updates = req.body as Partial<SpaProduct>;
+  const updates = { ...(req.body as Partial<SpaProduct>) };
+  if (updates.image) {
+    updates.image = await uploadProductImageIfNeeded(updates.image);
+  }
   const state = await loadState();
   state.products = state.products.map((p) =>
     p.id === id ? { ...p, ...updates } : p
   );
   await saveState(state);
-  res.json({ ok: true });
+  res.json({ ok: true, image: updates.image });
 });
 
 app.delete('/api/products/:id', async (req, res) => {

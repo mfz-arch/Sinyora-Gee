@@ -82,6 +82,25 @@ const STORAGE_KEYS = {
   CURRENT_USER: 'sinyora_gee_current_user_v1',
 };
 
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+
+async function syncWithBackend(
+  endpoint: string,
+  options?: RequestInit
+): Promise<unknown> {
+  try {
+    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+      headers: { 'Content-Type': 'application/json' },
+      ...options,
+    });
+    if (!res.ok) return null;
+    return await res.json();
+  } catch {
+    return null;
+  }
+}
+
 export function StoreProvider({ children }: { children: React.ReactNode }) {
   const [theme, setThemeState] = useState<BrandTheme>('flyer-rose');
   const [services, setServices] = useState<SpaService[]>(INITIAL_SERVICES);
@@ -147,6 +166,43 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     } catch {
       // Fallback to defaults if storage unavailable
     }
+
+    // Live sync with Shared Backend API (Firestore / MongoDB / Persistent Store)
+    syncWithBackend('/api/state').then((remote: any) => {
+      if (!remote || typeof remote !== 'object') return;
+      if (Array.isArray(remote.services) && remote.services.length > 0) {
+        setServices(remote.services);
+        localStorage.setItem(
+          STORAGE_KEYS.SERVICES,
+          JSON.stringify(remote.services)
+        );
+      }
+      if (Array.isArray(remote.products)) {
+        setProducts(remote.products);
+        localStorage.setItem(
+          STORAGE_KEYS.PRODUCTS,
+          JSON.stringify(remote.products)
+        );
+      }
+      if (Array.isArray(remote.bookings)) {
+        setBookings(remote.bookings);
+        localStorage.setItem(
+          STORAGE_KEYS.BOOKINGS,
+          JSON.stringify(remote.bookings)
+        );
+      }
+      if (Array.isArray(remote.orders)) {
+        setOrders(remote.orders);
+        localStorage.setItem(
+          STORAGE_KEYS.ORDERS,
+          JSON.stringify(remote.orders)
+        );
+      }
+      if (Array.isArray(remote.users) && remote.users.length > 0) {
+        setUsers(remote.users);
+        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(remote.users));
+      }
+    });
   }, []);
 
   const setTheme = (newTheme: BrandTheme) => {
@@ -220,6 +276,11 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       localStorage.setItem(STORAGE_KEYS.CURRENT_USER, JSON.stringify(newUser));
     } catch {}
 
+    void syncWithBackend('/api/auth/register', {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+
     return {
       ok: true,
       message: `Account created! Welcome to Sinyora Gee, ${newUser.name}.`,
@@ -261,6 +322,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend('/api/bookings', {
+      method: 'POST',
+      body: JSON.stringify(newBooking),
+    });
     return newBooking;
   };
 
@@ -270,6 +335,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.BOOKINGS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend(`/api/bookings/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
   };
 
   const addToCart = (product: SpaProduct) => {
@@ -319,6 +388,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend('/api/orders', {
+      method: 'POST',
+      body: JSON.stringify(newOrder),
+    });
     return newOrder;
   };
 
@@ -328,6 +401,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.ORDERS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend(`/api/orders/${id}/status`, {
+      method: 'PATCH',
+      body: JSON.stringify({ status }),
+    });
   };
 
   const addProduct = (productData: Omit<SpaProduct, 'id' | 'createdAt'>) => {
@@ -341,6 +418,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend('/api/products', {
+      method: 'POST',
+      body: JSON.stringify(newProduct),
+    });
   };
 
   const updateProduct = (
@@ -352,6 +433,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend(`/api/products/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify(updates),
+    });
   };
 
   const deleteProduct = (id: string) => {
@@ -360,6 +445,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.PRODUCTS, JSON.stringify(next));
     } catch {}
+    void syncWithBackend(`/api/products/${id}`, {
+      method: 'DELETE',
+    });
   };
 
   const addService = (serviceData: Omit<SpaService, 'id'>) => {
@@ -372,6 +460,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(next));
     } catch {}
+    void syncWithBackend('/api/services', {
+      method: 'POST',
+      body: JSON.stringify(newService),
+    });
   };
 
   const updateServicePrice = (id: string, price: number) => {
@@ -380,6 +472,10 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(next));
     } catch {}
+    void syncWithBackend(`/api/services/${id}`, {
+      method: 'PUT',
+      body: JSON.stringify({ price }),
+    });
   };
 
   const deleteService = (id: string) => {
@@ -388,6 +484,9 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
     try {
       localStorage.setItem(STORAGE_KEYS.SERVICES, JSON.stringify(next));
     } catch {}
+    void syncWithBackend(`/api/services/${id}`, {
+      method: 'DELETE',
+    });
   };
 
   return (

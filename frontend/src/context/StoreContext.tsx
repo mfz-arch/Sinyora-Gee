@@ -82,23 +82,36 @@ const STORAGE_KEYS = {
   CURRENT_USER: 'sinyora_gee_current_user_v1',
 };
 
-const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000';
+const API_BASE_URL = (
+  process.env.NEXT_PUBLIC_API_URL || 'https://sinyora-gee.onrender.com'
+).replace(/\/+$/, '');
 
 async function syncWithBackend(
   endpoint: string,
-  options?: RequestInit
+  options?: RequestInit,
+  retries = 2
 ): Promise<unknown> {
-  try {
-    const res = await fetch(`${API_BASE_URL}${endpoint}`, {
-      headers: { 'Content-Type': 'application/json' },
-      ...options,
-    });
-    if (!res.ok) return null;
-    return await res.json();
-  } catch {
-    return null;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(`${API_BASE_URL}${endpoint}`, {
+        headers: { 'Content-Type': 'application/json' },
+        cache: 'no-store',
+        ...options,
+      });
+      if (res.ok) {
+        return await res.json();
+      }
+      if (res.status < 500 && res.status !== 429) {
+        return null;
+      }
+    } catch {
+      // Render free tier may be waking up; wait briefly and retry
+    }
+    if (attempt < retries) {
+      await new Promise((r) => setTimeout(r, 2500));
+    }
   }
+  return null;
 }
 
 export function StoreProvider({ children }: { children: React.ReactNode }) {
@@ -167,42 +180,56 @@ export function StoreProvider({ children }: { children: React.ReactNode }) {
       // Fallback to defaults if storage unavailable
     }
 
-    // Live sync with Shared Backend API (Firestore / MongoDB / Persistent Store)
-    syncWithBackend('/api/state').then((remote: any) => {
-      if (!remote || typeof remote !== 'object') return;
-      if (Array.isArray(remote.services) && remote.services.length > 0) {
-        setServices(remote.services);
-        localStorage.setItem(
-          STORAGE_KEYS.SERVICES,
-          JSON.stringify(remote.services)
-        );
-      }
-      if (Array.isArray(remote.products)) {
-        setProducts(remote.products);
-        localStorage.setItem(
-          STORAGE_KEYS.PRODUCTS,
-          JSON.stringify(remote.products)
-        );
-      }
-      if (Array.isArray(remote.bookings)) {
-        setBookings(remote.bookings);
-        localStorage.setItem(
-          STORAGE_KEYS.BOOKINGS,
-          JSON.stringify(remote.bookings)
-        );
-      }
-      if (Array.isArray(remote.orders)) {
-        setOrders(remote.orders);
-        localStorage.setItem(
-          STORAGE_KEYS.ORDERS,
-          JSON.stringify(remote.orders)
-        );
-      }
-      if (Array.isArray(remote.users) && remote.users.length > 0) {
-        setUsers(remote.users);
-        localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(remote.users));
-      }
-    });
+    // Live sync with Shared Backend API (MongoDB Atlas on Render)
+    const pullRemoteState = () => {
+      syncWithBackend('/api/state').then((remote: any) => {
+        if (!remote || typeof remote !== 'object') return;
+        if (Array.isArray(remote.services) && remote.services.length > 0) {
+          setServices(remote.services);
+          localStorage.setItem(
+            STORAGE_KEYS.SERVICES,
+            JSON.stringify(remote.services)
+          );
+        }
+        if (Array.isArray(remote.products)) {
+          setProducts(remote.products);
+          localStorage.setItem(
+            STORAGE_KEYS.PRODUCTS,
+            JSON.stringify(remote.products)
+          );
+        }
+        if (Array.isArray(remote.bookings)) {
+          setBookings(remote.bookings);
+          localStorage.setItem(
+            STORAGE_KEYS.BOOKINGS,
+            JSON.stringify(remote.bookings)
+          );
+        }
+        if (Array.isArray(remote.orders)) {
+          setOrders(remote.orders);
+          localStorage.setItem(
+            STORAGE_KEYS.ORDERS,
+            JSON.stringify(remote.orders)
+          );
+        }
+        if (Array.isArray(remote.users) && remote.users.length > 0) {
+          setUsers(remote.users);
+          localStorage.setItem(STORAGE_KEYS.USERS, JSON.stringify(remote.users));
+        }
+      });
+    };
+
+    pullRemoteState();
+
+    // Auto-refresh every 15s and when switching back to the tab/app so PC & Phone stay synced
+    const pollId = setInterval(pullRemoteState, 15000);
+    const onFocus = () => pullRemoteState();
+    window.addEventListener('focus', onFocus);
+
+    return () => {
+      clearInterval(pollId);
+      window.removeEventListener('focus', onFocus);
+    };
   }, []);
 
   const setTheme = (newTheme: BrandTheme) => {

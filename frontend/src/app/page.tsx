@@ -12,6 +12,7 @@ import ClientPortalModal from '@/components/ClientPortalModal';
 import AdminDashboard from '@/components/AdminDashboard';
 import WelcomeLoader from '@/components/WelcomeLoader';
 import QrCodeModal from '@/components/QrCodeModal';
+import DownloadAppSection from '@/components/DownloadAppSection';
 import { useStore } from '@/context/StoreContext';
 
 export default function HomePage() {
@@ -91,6 +92,7 @@ export default function HomePage() {
         ) : (
           <>
             <HeroSection onOpenBooking={handleRequestBooking} />
+            <DownloadAppSection />
             <ServicesSection onOpenBooking={handleRequestBooking} />
             <ProductsSection
               onOpenAdminProducts={handleOpenAdminProducts}

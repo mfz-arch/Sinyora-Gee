@@ -123,12 +123,13 @@ h4,
 .balanced-heading {
   text-wrap: balance;
   font-family:
+    'Cinzel Decorative',
     'Playfair Display',
     'Cormorant Garamond',
     Georgia,
     'Times New Roman',
     serif;
-  line-height: 1.16;
+  line-height: 1.18;
 }
 
 p,

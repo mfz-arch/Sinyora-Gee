@@ -1,0 +1,27 @@
+{
+  "expo": {
+    "name": "SINYORA GEE",
+    "slug": "sinyora-gee",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "dark",
+    "newArchEnabled": true,
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#150b10"
+    },
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.sinyoragee.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#150b10"
+      },
+      "package": "com.sinyoragee.app"
+    }
+  }
+}

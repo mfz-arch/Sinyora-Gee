@@ -15,15 +15,19 @@ import { useStore } from '@/context/StoreContext';
 interface AuthModalProps {
   isOpen: boolean;
   initialMode?: 'signin' | 'signup' | 'admin';
+  promptBanner?: string;
   onClose: () => void;
   onSuccessAdminLogin: () => void;
+  onSuccessAuth?: () => void;
 }
 
 export default function AuthModal({
   isOpen,
   initialMode = 'signin',
+  promptBanner,
   onClose,
   onSuccessAdminLogin,
+  onSuccessAuth,
 }: AuthModalProps) {
   const { login, registerClient } = useStore();
 
@@ -69,6 +73,7 @@ export default function AuthModal({
     if (res.user?.role === 'admin') {
       onSuccessAdminLogin();
     }
+    onSuccessAuth?.();
     onClose();
   };
 
@@ -89,6 +94,7 @@ export default function AuthModal({
     }
 
     setFeedback({ type: 'success', text: res.message });
+    onSuccessAuth?.();
     onClose();
   };
 

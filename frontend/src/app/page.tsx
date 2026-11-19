@@ -31,6 +31,17 @@ export default function HomePage() {
   >('signin');
   const [isClientPortalOpen, setIsClientPortalOpen] = useState(false);
   const [isQrModalOpen, setIsQrModalOpen] = useState(false);
+  const [pendingBookingAfterAuth, setPendingBookingAfterAuth] = useState(false);
+
+  const handleRequestBooking = () => {
+    if (currentUser) {
+      setIsBookingOpen(true);
+    } else {
+      setPendingBookingAfterAuth(true);
+      setAuthInitialMode('signin');
+      setIsAuthOpen(true);
+    }
+  };
 
   const handleOpenAdminProducts = () => {
     setAdminInitialTab('products');
@@ -39,11 +50,13 @@ export default function HomePage() {
   };
 
   const openClientAuth = () => {
+    setPendingBookingAfterAuth(false);
     setAuthInitialMode('signin');
     setIsAuthOpen(true);
   };
 
   const openAdminAuth = () => {
+    setPendingBookingAfterAuth(false);
     setAuthInitialMode('admin');
     setIsAuthOpen(true);
   };
@@ -62,7 +75,7 @@ export default function HomePage() {
       <Navbar
         activeView={activeView}
         setActiveView={setActiveView}
-        onOpenBooking={() => setIsBookingOpen(true)}
+        onOpenBooking={handleRequestBooking}
         onOpenClientAuth={openClientAuth}
         onOpenAdminAuth={openAdminAuth}
         onOpenClientPortal={() => setIsClientPortalOpen(true)}
@@ -77,8 +90,8 @@ export default function HomePage() {
           />
         ) : (
           <>
-            <HeroSection onOpenBooking={() => setIsBookingOpen(true)} />
-            <ServicesSection onOpenBooking={() => setIsBookingOpen(true)} />
+            <HeroSection onOpenBooking={handleRequestBooking} />
+            <ServicesSection onOpenBooking={handleRequestBooking} />
             <ProductsSection
               onOpenAdminProducts={handleOpenAdminProducts}
               onOpenClientPortal={() => setIsClientPortalOpen(true)}
@@ -91,7 +104,7 @@ export default function HomePage() {
       {/* Footer is only shown on the client storefront, not on the admin management dashboard */}
       {activeView !== 'admin' && (
         <Footer
-          onOpenBooking={() => setIsBookingOpen(true)}
+          onOpenBooking={handleRequestBooking}
           onOpenAuth={openAdminAuth}
         />
       )}
@@ -100,15 +113,29 @@ export default function HomePage() {
       <BookingModal
         isOpen={isBookingOpen}
         onClose={() => setIsBookingOpen(false)}
+        onOpenAuth={openClientAuth}
       />
 
       <AuthModal
         isOpen={isAuthOpen}
         initialMode={authInitialMode}
-        onClose={() => setIsAuthOpen(false)}
+        promptBanner={
+          pendingBookingAfterAuth
+            ? 'Please sign in or create an account to book. Your name, phone number, and location will be filled in automatically!'
+            : undefined
+        }
+        onClose={() => {
+          setIsAuthOpen(false);
+        }}
         onSuccessAdminLogin={() => {
           setAdminInitialTab('bookings');
           setActiveView('admin');
+        }}
+        onSuccessAuth={() => {
+          if (pendingBookingAfterAuth) {
+            setPendingBookingAfterAuth(false);
+            setIsBookingOpen(true);
+          }
         }}
       />
 

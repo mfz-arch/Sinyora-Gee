@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   X,
   Calendar,
@@ -12,6 +12,7 @@ import {
   MessageCircle,
   Plus,
   Trash2,
+  UserCheck,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { AVAILABLE_TIME_SLOTS, STUDIO_INFO } from '@/data/initialData';
@@ -21,6 +22,7 @@ import { buildWhatsAppBookingUrl, formatTsh } from '@/utils/format';
 interface BookingModalProps {
   isOpen: boolean;
   onClose: () => void;
+  onOpenAuth?: () => void;
 }
 
 const PAYMENT_METHODS: PaymentMethod[] = [
@@ -31,7 +33,11 @@ const PAYMENT_METHODS: PaymentMethod[] = [
   'Cash',
 ];
 
-export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
+export default function BookingModal({
+  isOpen,
+  onClose,
+  onOpenAuth,
+}: BookingModalProps) {
   const {
     services,
     selectedServicesForBooking,
@@ -60,6 +66,14 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
     useState<ServiceBooking | null>(null);
   const [errorMsg, setErrorMsg] = useState('');
 
+  useEffect(() => {
+    if (isOpen && currentUser) {
+      setClientName(currentUser.name);
+      setClientPhone(currentUser.phone);
+      setHostelOrRoom(currentUser.hostel || 'Royal Hostel');
+    }
+  }, [isOpen, currentUser]);
+
   if (!isOpen) return null;
 
   const totalPrice = selectedServicesForBooking.reduce(
@@ -70,6 +84,11 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg('');
+
+    if (!currentUser) {
+      setErrorMsg('Please sign in or create an account before completing your booking.');
+      return;
+    }
 
     if (selectedServicesForBooking.length === 0) {
       setErrorMsg('Please select at least one facial, massage, or makeup service.');
@@ -508,49 +527,95 @@ export default function BookingModal({ isOpen, onClose }: BookingModalProps) {
                 </div>
               </div>
 
-              {/* Step 3: Student / Client Details */}
-              <div
-                style={{
-                  display: 'grid',
-                  gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
-                  gap: '0.85rem',
-                }}
-              >
-                <div className="form-field">
-                  <label className="form-label" htmlFor="booking-client-name">
-                    Your Full Name *
-                  </label>
-                  <input
-                    id="booking-client-name"
-                    name="name"
-                    type="text"
-                    autoComplete="name"
-                    required
-                    placeholder="e.g. Amina Juma"
-                    value={clientName}
-                    onChange={(e) => setClientName(e.target.value)}
-                    className="form-input"
-                  />
+              {/* Step 3: Saved Account Details (Auto-filled from Logged-In User) */}
+              {currentUser ? (
+                <div
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.65rem',
+                    padding: '0.8rem 1rem',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'var(--bg-secondary)',
+                    border: '1px solid var(--gold-border)',
+                  }}
+                >
+                  <div
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.65rem',
+                    }}
+                  >
+                    <span
+                      style={{
+                        inlineSize: '36px',
+                        blockSize: '36px',
+                        borderRadius: '50%',
+                        background: 'var(--brand-soft)',
+                        color: 'var(--brand-color)',
+                        display: 'grid',
+                        placeContent: 'center',
+                        flexShrink: 0,
+                      }}
+                    >
+                      <UserCheck size={18} />
+                    </span>
+                    <div>
+                      <div
+                        style={{
+                          fontSize: '0.7rem',
+                          fontWeight: 700,
+                          textTransform: 'uppercase',
+                          letterSpacing: '0.07em',
+                          color: 'var(--brand-color)',
+                        }}
+                      >
+                        Booking as Signed-In Client
+                      </div>
+                      <div style={{ fontWeight: 800, fontSize: '0.96rem' }}>
+                        {clientName} •{' '}
+                        <span style={{ color: 'var(--text-secondary)' }}>
+                          {clientPhone}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
                 </div>
-
-                <div className="form-field">
-                  <label className="form-label" htmlFor="booking-client-phone">
-                    WhatsApp / Phone Number *
-                  </label>
-                  <input
-                    id="booking-client-phone"
-                    name="tel"
-                    type="tel"
-                    inputMode="tel"
-                    autoComplete="tel"
-                    required
-                    placeholder="e.g. 0712 345 678"
-                    value={clientPhone}
-                    onChange={(e) => setClientPhone(e.target.value)}
-                    className="form-input"
-                  />
+              ) : (
+                <div
+                  style={{
+                    padding: '1rem',
+                    borderRadius: 'var(--radius-md)',
+                    background: 'rgba(184, 29, 91, 0.08)',
+                    border: '1.5px solid var(--brand-color)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    flexWrap: 'wrap',
+                    gap: '0.75rem',
+                  }}
+                >
+                  <div style={{ fontSize: '0.86rem', fontWeight: 600 }}>
+                    Please sign in or create an account to complete your booking.
+                  </div>
+                  {onOpenAuth && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onClose();
+                        onOpenAuth();
+                      }}
+                      className="btn-primary"
+                      style={{ padding: '0.45rem 0.95rem', fontSize: '0.82rem' }}
+                    >
+                      Sign In / Sign Up
+                    </button>
+                  )}
                 </div>
-              </div>
+              )}
 
               <div className="form-field">
                 <label className="form-label" htmlFor="booking-hostel">

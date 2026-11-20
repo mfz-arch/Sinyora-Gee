@@ -1,7 +1,7 @@
 {
   "id": "/app",
-  "name": "SINYORA GEE",
-  "short_name": "SINYORA GEE",
+  "name": "Sinyora Gee",
+  "short_name": "Sinyora Gee",
   "description": "SINYORA GEE — Luxury Facial, Cosmetics & Spa at Royal Hostel & Domicile.",
   "start_url": "/app",
   "scope": "/",
@@ -31,3 +31,4 @@
     }
   ]
 }
+

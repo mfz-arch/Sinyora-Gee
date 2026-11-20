@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "SINYORA GEE",
+    "name": "Sinyora Gee",
     "slug": "sinyora-gee",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -25,3 +25,4 @@
     }
   }
 }
+

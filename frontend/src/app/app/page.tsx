@@ -449,44 +449,133 @@ export default function SinyoraMobileAppPage() {
       <main style={{ flex: 1 }}>
         {activeTab === 'home' && (
           <>
-            {/* Compact App Hero Strip */}
+            {/* Warm, Welcoming Luxury App Hero Card */}
             <section
               style={{
-                background:
-                  'radial-gradient(circle at 50% 30%, #341626 0%, #170b11 100%)',
-                color: '#fffdf9',
-                padding: '1.35rem 1rem',
-                borderBottom: '1px solid rgba(212, 175, 55, 0.35)',
+                padding: '1rem 0.95rem 0.35rem',
+                background: 'var(--bg-primary)',
               }}
             >
-              <div className="page-shell" style={{ paddingInline: 0 }}>
+              <div
+                className="page-shell"
+                style={{
+                  position: 'relative',
+                  overflow: 'hidden',
+                  borderRadius: '22px',
+                  padding: '1.35rem 1.25rem',
+                  background:
+                    'linear-gradient(135deg, rgba(168, 22, 82, 0.92) 0%, rgba(74, 15, 42, 0.95) 55%, rgba(28, 10, 19, 0.98) 100%)',
+                  border: '1.5px solid rgba(212, 175, 55, 0.65)',
+                  boxShadow: '0 14px 32px rgba(138, 17, 67, 0.22)',
+                  color: '#fffdf9',
+                }}
+              >
+                {/* Soft Top-Right Decorative Glow */}
+                <div
+                  aria-hidden="true"
+                  style={{
+                    position: 'absolute',
+                    top: '-40px',
+                    right: '-40px',
+                    inlineSize: '150px',
+                    blockSize: '150px',
+                    borderRadius: '50%',
+                    background:
+                      'radial-gradient(circle, rgba(247, 223, 139, 0.28) 0%, transparent 70%)',
+                    pointerEvents: 'none',
+                  }}
+                />
+
                 <div
                   style={{
-                    fontSize: '0.72rem',
+                    display: 'inline-flex',
+                    alignItems: 'center',
+                    gap: '0.35rem',
+                    padding: '0.26rem 0.72rem',
+                    borderRadius: '999px',
+                    background: 'rgba(255, 255, 255, 0.14)',
+                    border: '1px solid rgba(247, 223, 139, 0.45)',
                     color: '#f7df8b',
+                    fontSize: '0.7rem',
                     fontWeight: 700,
-                    letterSpacing: '0.12em',
-                    textTransform: 'uppercase',
-                    marginBlockEnd: '0.25rem',
+                    letterSpacing: '0.06em',
+                    marginBlockEnd: '0.7rem',
                   }}
                 >
-                  Royal Hostel • Domicile Service Available
+                  <MapPin size={12} />
+                  <span>Royal Hostel • Domicile Service Available</span>
                 </div>
+
                 <h2
                   style={{
-                    fontFamily: "'Cinzel Decorative', serif",
-                    fontStyle: 'italic',
-                    fontSize: 'clamp(1.25rem, 4vw, 1.75rem)',
-                    color: '#fff9de',
-                    marginBlockEnd: '0.35rem',
+                    fontFamily: "'Playfair Display', Georgia, serif",
+                    fontSize: 'clamp(1.35rem, 4.5vw, 1.85rem)',
+                    fontWeight: 800,
+                    color: '#ffffff',
+                    lineHeight: 1.2,
+                    marginBlockEnd: '0.4rem',
                   }}
                 >
-                  Luxury Treatments &amp; Glow Menu
+                  Welcome back,{' '}
+                  <span style={{ color: '#f7df8b', fontStyle: 'italic' }}>
+                    {currentUser.name.split(' ')[0]}
+                  </span>{' '}
+                  ✨
                 </h2>
-                <p style={{ fontSize: '0.84rem', color: '#f5cdd8' }}>
-                  Tap any flyer section below to view treatments and book with
-                  your saved profile.
+
+                <p
+                  style={{
+                    fontSize: '0.86rem',
+                    color: '#fce8ee',
+                    lineHeight: 1.5,
+                    maxInlineSize: '46ch',
+                    marginBlockEnd: '1rem',
+                  }}
+                >
+                  Ready to glow today? Pick any treatment from our menu below or
+                  browse skincare essentials—your profile is already saved.
                 </p>
+
+                <div
+                  style={{
+                    display: 'flex',
+                    flexWrap: 'wrap',
+                    gap: '0.55rem',
+                  }}
+                >
+                  <button
+                    type="button"
+                    onClick={() => setIsBookingOpen(true)}
+                    className="btn-gold"
+                    style={{
+                      padding: '0.52rem 1rem',
+                      fontSize: '0.8rem',
+                    }}
+                  >
+                    <Sparkles size={14} />
+                    <span>Quick Book</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setActiveTab('shop')}
+                    style={{
+                      padding: '0.52rem 1rem',
+                      fontSize: '0.8rem',
+                      fontWeight: 700,
+                      borderRadius: '999px',
+                      background: 'rgba(255, 255, 255, 0.14)',
+                      border: '1px solid rgba(255, 255, 255, 0.35)',
+                      color: '#ffffff',
+                      display: 'inline-flex',
+                      alignItems: 'center',
+                      gap: '0.35rem',
+                    }}
+                  >
+                    <ShoppingBag size={14} />
+                    <span>Cosmetics Shop</span>
+                  </button>
+                </div>
               </div>
             </section>
 
@@ -849,3 +938,4 @@ export default function SinyoraMobileAppPage() {
     </div>
   );
 }
+

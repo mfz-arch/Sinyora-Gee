@@ -21,6 +21,7 @@ function getDefaultState(): DatabaseSchema {
     orders: [],
     users: INITIAL_USERS,
     colorTheme: 'signature-magenta',
+    pushSubscriptions: [],
   };
 }
 
@@ -51,6 +52,9 @@ function readLocalFileState(): DatabaseSchema {
           ? parsed.users
           : INITIAL_USERS,
       colorTheme: parsed.colorTheme || 'signature-magenta',
+      pushSubscriptions: Array.isArray(parsed.pushSubscriptions)
+        ? parsed.pushSubscriptions
+        : [],
     };
   } catch {
     return getDefaultState();

@@ -4,14 +4,22 @@ import dotenv from 'dotenv';
 import { getActiveDbMode, initDatabase, loadState, saveState } from './db';
 import { isCloudinaryEnabled, uploadProductImageIfNeeded } from './cloudinary';
 import {
+  getPublicVapidKey,
+  notifyAdmins,
+  notifyAllClients,
+  notifySpecificClient,
+} from './push';
+import {
   BookingStatus,
   ColorThemeId,
   OrderStatus,
   ProductOrder,
+  PushSubscriptionRecord,
   ServiceBooking,
   SpaProduct,
   SpaService,
   UserAccount,
+  UserRole,
 } from './types';
 
 dotenv.config();
@@ -43,6 +51,52 @@ app.get('/api/health', (_req, res) => {
     cloudinaryEnabled: isCloudinaryEnabled(),
     timestamp: new Date().toISOString(),
   });
+});
+
+// 1b. Web Push Notification Endpoints
+app.get('/api/push/public-key', (_req, res) => {
+  res.json({ publicKey: getPublicVapidKey() });
+});
+
+app.post('/api/push/subscribe', async (req, res) => {
+  const { subscription, userId, phone, role } = req.body as {
+    subscription?: {
+      endpoint?: string;
+      keys?: { p256dh?: string; auth?: string };
+    };
+    userId?: string;
+    phone?: string;
+    role?: UserRole;
+  };
+
+  if (
+    !subscription?.endpoint ||
+    !subscription.keys?.p256dh ||
+    !subscription.keys?.auth
+  ) {
+    res.status(400).json({ ok: false, message: 'Invalid push subscription.' });
+    return;
+  }
+
+  const state = await loadState();
+  const list = state.pushSubscriptions || [];
+  const filtered = list.filter((s) => s.endpoint !== subscription.endpoint);
+
+  const record: PushSubscriptionRecord = {
+    endpoint: subscription.endpoint,
+    keys: {
+      p256dh: subscription.keys.p256dh,
+      auth: subscription.keys.auth,
+    },
+    userId,
+    phone,
+    role: role === 'admin' ? 'admin' : 'client',
+    createdAt: new Date().toISOString(),
+  };
+
+  state.pushSubscriptions = [record, ...filtered];
+  await saveState(state);
+  res.json({ ok: true });
 });
 
 // 2. Full State Endpoint (Used by both Website frontend/ and Mobile App app/)
@@ -190,6 +244,14 @@ app.post('/api/products', async (req, res) => {
   };
   state.products.unshift(created);
   await saveState(state);
+
+  void notifyAllClients(state, saveState, {
+    title: '🛍️ New Arrival at Sinyora Gee!',
+    body: `${created.name} (${created.tag}) — Tsh ${created.price.toLocaleString()} is now in the Cosmetics Shop.`,
+    url: '/app',
+    tag: `product-${created.id}`,
+  });
+
   res.status(201).json(created);
 });
 
@@ -234,6 +296,15 @@ app.post('/api/bookings', async (req, res) => {
   };
   state.bookings.unshift(created);
   await saveState(state);
+
+  const serviceNames = created.services.map((s) => s.name).join(', ');
+  void notifyAdmins(state, saveState, {
+    title: `✨ New Booking — ${created.clientName}`,
+    body: `${serviceNames} • ${created.appointmentDate} at ${created.appointmentTime} (${created.hostelOrRoom})`,
+    url: '/app',
+    tag: `booking-${created.id}`,
+  });
+
   res.status(201).json(created);
 });
 
@@ -241,10 +312,40 @@ app.patch('/api/bookings/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body as { status: BookingStatus };
   const state = await loadState();
-  state.bookings = state.bookings.map((b) =>
-    b.id === id ? { ...b, status } : b
-  );
+  let targetBooking: ServiceBooking | undefined;
+  state.bookings = state.bookings.map((b) => {
+    if (b.id === id) {
+      targetBooking = { ...b, status };
+      return targetBooking;
+    }
+    return b;
+  });
   await saveState(state);
+
+  if (targetBooking) {
+    const names = targetBooking.services.map((s) => s.name).join(', ');
+    const title =
+      status === 'Confirmed'
+        ? '✅ Booking Confirmed — Sinyora Gee'
+        : status === 'Completed'
+          ? '✨ Session Completed — Sinyora Gee'
+          : 'Appointment Update — Sinyora Gee';
+    const body =
+      status === 'Confirmed'
+        ? `Your ${names} appointment on ${targetBooking.appointmentDate} at ${targetBooking.appointmentTime} is confirmed!`
+        : status === 'Completed'
+          ? `Thank you for visiting Sinyora Gee! Your ${names} session is complete.`
+          : `Your appointment (${id}) status changed to ${status}.`;
+
+    void notifySpecificClient(
+      state,
+      saveState,
+      targetBooking.clientPhone,
+      targetBooking.clientId,
+      { title, body, url: '/app', tag: `booking-status-${id}` }
+    );
+  }
+
   res.json({ ok: true, id, status });
 });
 
@@ -268,6 +369,14 @@ app.post('/api/orders', async (req, res) => {
   };
   state.orders.unshift(created);
   await saveState(state);
+
+  void notifyAdmins(state, saveState, {
+    title: `🛒 New Product Order — ${created.clientName}`,
+    body: `${created.items.map((i) => `${i.name} x${i.quantity}`).join(', ')} • Tsh ${created.totalPrice.toLocaleString()}`,
+    url: '/app',
+    tag: `order-${created.id}`,
+  });
+
   res.status(201).json(created);
 });
 
@@ -275,10 +384,31 @@ app.patch('/api/orders/:id/status', async (req, res) => {
   const { id } = req.params;
   const { status } = req.body as { status: OrderStatus };
   const state = await loadState();
-  state.orders = state.orders.map((o) =>
-    o.id === id ? { ...o, status } : o
-  );
+  let targetOrder: ProductOrder | undefined;
+  state.orders = state.orders.map((o) => {
+    if (o.id === id) {
+      targetOrder = { ...o, status };
+      return targetOrder;
+    }
+    return o;
+  });
   await saveState(state);
+
+  if (targetOrder) {
+    void notifySpecificClient(
+      state,
+      saveState,
+      targetOrder.clientPhone,
+      targetOrder.clientId,
+      {
+        title: `📦 Order ${id} — ${status}`,
+        body: `Your Sinyora Gee skincare order is now ${status}.`,
+        url: '/app',
+        tag: `order-status-${id}`,
+      }
+    );
+  }
+
   res.json({ ok: true, id, status });
 });
 

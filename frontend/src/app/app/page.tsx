@@ -16,15 +16,17 @@ import {
   MapPin,
   MessageCircle,
   CheckCircle2,
+  Bell,
 } from 'lucide-react';
 import { useStore } from '@/context/StoreContext';
 import { STUDIO_INFO } from '@/data/initialData';
 import { formatTsh } from '@/utils/format';
+import { isPushSupported, subscribeUserToPush } from '@/utils/pushNotifications';
 import ServicesSection from '@/components/ServicesSection';
 import ProductsSection from '@/components/ProductsSection';
 import BookingModal from '@/components/BookingModal';
 import ClientPortalModal from '@/components/ClientPortalModal';
-import AdminDashboard from '@/components/AdminDashboard';
+import MobileAdminView from '@/components/MobileAdminView';
 import QrCodeModal from '@/components/QrCodeModal';
 
 type AppTab = 'home' | 'shop' | 'bookings' | 'admin' | 'profile';
@@ -43,11 +45,31 @@ export default function SinyoraMobileAppPage() {
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [authError, setAuthError] = useState('');
+  const [pushPermission, setPushPermission] =
+    useState<NotificationPermission>('default');
+  const [pushReady, setPushReady] = useState(false);
 
   useEffect(() => {
     const timer = setTimeout(() => setShowSplash(false), 1850);
     return () => clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!currentUser || !isPushSupported()) return;
+    setPushPermission(Notification.permission);
+    if (Notification.permission === 'granted') {
+      subscribeUserToPush(currentUser).then((res) => {
+        if (res.ok) setPushReady(true);
+      });
+    }
+  }, [currentUser]);
+
+  const handleEnablePush = async () => {
+    if (!currentUser) return;
+    const res = await subscribeUserToPush(currentUser);
+    setPushPermission(res.permission);
+    if (res.ok) setPushReady(true);
+  };
 
   const totalCartItems = cart.reduce((sum, item) => sum + item.quantity, 0);
 
@@ -447,6 +469,52 @@ export default function SinyoraMobileAppPage() {
 
       {/* Main App Content Area */}
       <main style={{ flex: 1 }}>
+        {/* 1-Tap Background Push Notification Banner (when permission is not yet granted) */}
+        {isPushSupported() && pushPermission === 'default' && !pushReady && (
+          <div style={{ padding: '0.75rem 0.95rem 0' }}>
+            <div
+              className="page-shell"
+              style={{
+                padding: '0.75rem 1rem',
+                borderRadius: '14px',
+                background: 'rgba(184, 29, 91, 0.08)',
+                border: '1px solid rgba(184, 29, 91, 0.3)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                gap: '0.75rem',
+                flexWrap: 'wrap',
+              }}
+            >
+              <div
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem',
+                  fontSize: '0.8rem',
+                  fontWeight: 600,
+                  color: 'var(--text-primary)',
+                }}
+              >
+                <Bell size={16} color="var(--brand-color)" />
+                <span>
+                  {isAdmin
+                    ? 'Enable instant alerts for new bookings & orders (even on WhatsApp).'
+                    : 'Enable instant alerts when your booking is confirmed or new products drop!'}
+                </span>
+              </div>
+              <button
+                type="button"
+                onClick={handleEnablePush}
+                className="btn-primary"
+                style={{ padding: '0.38rem 0.85rem', fontSize: '0.76rem' }}
+              >
+                Enable Alerts
+              </button>
+            </div>
+          </div>
+        )}
+
         {activeTab === 'home' && (
           <>
             {/* Warm, Welcoming Luxury App Hero Card */}
@@ -750,10 +818,7 @@ export default function SinyoraMobileAppPage() {
         )}
 
         {activeTab === 'admin' && isAdmin && (
-          <AdminDashboard
-            onBackToStorefront={() => setActiveTab('home')}
-            onOpenQrModal={() => setIsQrModalOpen(true)}
-          />
+          <MobileAdminView onOpenQrModal={() => setIsQrModalOpen(true)} />
         )}
 
         {activeTab === 'profile' && (

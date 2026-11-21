@@ -117,6 +117,18 @@ export type ColorThemeId =
   | 'royal-emerald'
   | 'velvet-plum';
 
+export interface PushSubscriptionRecord {
+  endpoint: string;
+  keys: {
+    p256dh: string;
+    auth: string;
+  };
+  userId?: string;
+  phone?: string;
+  role: UserRole;
+  createdAt: string;
+}
+
 export interface DatabaseSchema {
   services: SpaService[];
   products: SpaProduct[];
@@ -124,5 +136,6 @@ export interface DatabaseSchema {
   orders: ProductOrder[];
   users: UserAccount[];
   colorTheme: ColorThemeId;
+  pushSubscriptions?: PushSubscriptionRecord[];
 }
 
